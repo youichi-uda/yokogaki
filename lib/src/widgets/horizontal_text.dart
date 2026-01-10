@@ -3,6 +3,7 @@ import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
 import '../models/warichu.dart';
+import '../models/text_decoration.dart';
 import '../rendering/horizontal_text_painter.dart';
 import '../rendering/horizontal_text_layouter.dart';
 
@@ -36,6 +37,9 @@ class HorizontalText extends StatelessWidget {
   /// Warichu (inline annotations) annotations
   final List<Warichu> warichuList;
 
+  /// Text decoration (underline, overline, etc.) annotations
+  final List<TextDecorationAnnotation> decorationList;
+
   const HorizontalText({
     super.key,
     required this.text,
@@ -45,6 +49,7 @@ class HorizontalText extends StatelessWidget {
     this.rubyList = const [],
     this.kentenList = const [],
     this.warichuList = const [],
+    this.decorationList = const [],
   });
 
   @override
@@ -100,6 +105,7 @@ class HorizontalText extends StatelessWidget {
         rubyList: rubyList,
         kentenList: kentenList,
         warichuList: warichuList,
+        decorationList: decorationList,
       ),
     );
   }

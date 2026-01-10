@@ -3,10 +3,12 @@ import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
 import '../models/warichu.dart';
+import '../models/text_decoration.dart';
 import 'horizontal_text_layouter.dart';
 import '../utils/ruby_renderer.dart';
 import '../utils/kenten_renderer.dart';
 import '../utils/warichu_renderer.dart';
+import '../utils/decoration_renderer.dart';
 
 /// Custom painter for horizontal Japanese text
 class HorizontalTextPainter extends CustomPainter {
@@ -17,6 +19,7 @@ class HorizontalTextPainter extends CustomPainter {
   final List<RubyText> rubyList;
   final List<Kenten> kentenList;
   final List<Warichu> warichuList;
+  final List<TextDecorationAnnotation> decorationList;
 
   HorizontalTextPainter({
     required this.text,
@@ -26,6 +29,7 @@ class HorizontalTextPainter extends CustomPainter {
     this.rubyList = const [],
     this.kentenList = const [],
     this.warichuList = const [],
+    this.decorationList = const [],
   });
 
   @override
@@ -86,6 +90,17 @@ class HorizontalTextPainter extends CustomPainter {
     if (warichuLayouts.isNotEmpty) {
       WarichuRenderer.render(canvas, warichuLayouts, style);
     }
+
+    // Draw text decorations (underlines, overlines, etc.)
+    if (decorationList.isNotEmpty) {
+      final decorationLayouts = DecorationRenderer.layoutDecorations(
+        text,
+        decorationList,
+        style,
+        layouts,
+      );
+      DecorationRenderer.render(canvas, decorationLayouts, style);
+    }
   }
 
   // Reusable TextPainter instance to avoid repeated allocations
@@ -144,6 +159,7 @@ class HorizontalTextPainter extends CustomPainter {
         showGrid != oldDelegate.showGrid ||
         rubyList != oldDelegate.rubyList ||
         kentenList != oldDelegate.kentenList ||
-        warichuList != oldDelegate.warichuList;
+        warichuList != oldDelegate.warichuList ||
+        decorationList != oldDelegate.decorationList;
   }
 }

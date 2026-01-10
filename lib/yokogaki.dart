@@ -13,6 +13,10 @@ export 'src/models/horizontal_text_span.dart';
 export 'src/models/ruby_text.dart';
 export 'src/models/kenten.dart';
 export 'src/models/warichu.dart';
+export 'src/models/text_decoration.dart';
+
+// Utils (for advanced usage)
+export 'src/utils/decoration_renderer.dart';
 
 // Re-export kinsoku package for convenience
 export 'package:kinsoku/kinsoku.dart';

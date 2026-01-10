@@ -551,6 +551,215 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 32),
+            const Text(
+              'Text Decorations (下線・上線)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '1. Underline Types:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('下線', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      HorizontalText(
+                        text: '重要な文章',
+                        decorationList: const [
+                          TextDecorationAnnotation(
+                            startIndex: 0,
+                            length: 2,
+                            type: TextDecorationLineType.underline,
+                          ),
+                        ],
+                        style: HorizontalTextStyle(
+                          baseStyle: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('二重下線', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      HorizontalText(
+                        text: '重要な文章',
+                        decorationList: const [
+                          TextDecorationAnnotation(
+                            startIndex: 0,
+                            length: 2,
+                            type: TextDecorationLineType.doubleUnderline,
+                          ),
+                        ],
+                        style: HorizontalTextStyle(
+                          baseStyle: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('波下線', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      HorizontalText(
+                        text: '重要な文章',
+                        decorationList: const [
+                          TextDecorationAnnotation(
+                            startIndex: 0,
+                            length: 2,
+                            type: TextDecorationLineType.wavyUnderline,
+                          ),
+                        ],
+                        style: HorizontalTextStyle(
+                          baseStyle: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('点線下線', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      HorizontalText(
+                        text: '重要な文章',
+                        decorationList: const [
+                          TextDecorationAnnotation(
+                            startIndex: 0,
+                            length: 2,
+                            type: TextDecorationLineType.dottedUnderline,
+                          ),
+                        ],
+                        style: HorizontalTextStyle(
+                          baseStyle: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              '2. Overline Types:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('上線', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      HorizontalText(
+                        text: '重要な文章',
+                        decorationList: const [
+                          TextDecorationAnnotation(
+                            startIndex: 0,
+                            length: 2,
+                            type: TextDecorationLineType.overline,
+                          ),
+                        ],
+                        style: HorizontalTextStyle(
+                          baseStyle: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('波上線', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      HorizontalText(
+                        text: '重要な文章',
+                        decorationList: const [
+                          TextDecorationAnnotation(
+                            startIndex: 0,
+                            length: 2,
+                            type: TextDecorationLineType.wavyOverline,
+                          ),
+                        ],
+                        style: HorizontalTextStyle(
+                          baseStyle: const TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              '3. Colored Decoration:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: '赤い下線と青い下線の例',
+              decorationList: const [
+                TextDecorationAnnotation(
+                  startIndex: 0,
+                  length: 2,
+                  type: TextDecorationLineType.underline,
+                  color: Colors.red,
+                  thickness: 2.0,
+                ),
+                TextDecorationAnnotation(
+                  startIndex: 5,
+                  length: 2,
+                  type: TextDecorationLineType.underline,
+                  color: Colors.blue,
+                  thickness: 2.0,
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 24),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              '4. Combined with Ruby:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: '東京は首都です',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 2, ruby: 'とうきょう'),
+                RubyText(startIndex: 3, length: 2, ruby: 'しゅと'),
+              ],
+              decorationList: const [
+                TextDecorationAnnotation(
+                  startIndex: 3,
+                  length: 2,
+                  type: TextDecorationLineType.underline,
+                  color: Colors.red,
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+                rubyStyle: const TextStyle(fontSize: 14, color: Colors.green),
+              ),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
