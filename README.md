@@ -38,6 +38,13 @@ Flutter package for Japanese horizontal text (yokogaki - 横書き) layout with 
   - Per-span ruby, kenten, and warichu annotations
   - Powerful text composition with `SimpleHorizontalTextSpan` and `GroupHorizontalTextSpan`
 
+- **Text Selection**: Interactive text selection
+  - Tap to select single character
+  - Drag to select text range
+  - Long press to copy text to clipboard
+  - Customizable selection color
+  - Full support for all typography features
+
 ## Installation
 
 Add this to your package's `pubspec.yaml` file:
@@ -293,6 +300,34 @@ HorizontalRichText(
 )
 ```
 
+### Selectable Text
+
+```dart
+SelectableHorizontalText(
+  text: 'これは選択可能なテキストです。',
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 24),
+  ),
+  maxWidth: 350,
+)
+```
+
+### Selectable Text - With Ruby
+
+```dart
+SelectableHorizontalText(
+  text: '日本語の選択可能なテキスト',
+  rubyList: const [
+    RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+    RubyText(startIndex: 4, length: 4, ruby: 'せんたくかのう'),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 28),
+    rubyStyle: TextStyle(fontSize: 14, color: Colors.blue),
+  ),
+)
+```
+
 ### Debug Grid
 
 ```dart
@@ -333,7 +368,9 @@ Performance improvements:
 - [x] Warichu (inline annotations)
 - [x] Rich text with multiple styles
 - [x] Performance optimizations
-- [ ] Text selection support
+- [x] Text selection support
+
+All planned features are now complete!
 
 ## Related Packages
 

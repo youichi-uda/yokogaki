@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-01-10
+
+### Added
+- **Text selection support**
+  - `SelectableHorizontalText` widget for selectable text
+  - `SelectableHorizontalTextPainter` for rendering selection highlighting
+  - Tap to select single character
+  - Drag to select text range
+  - Long press to show copy context menu
+  - Copy selected text to clipboard
+  - Customizable selection color
+  - Full support for all features (ruby, kenten, warichu)
+- Text selection examples in demo app
+
+### Features
+- Intuitive text selection with tap and drag gestures
+- Visual selection highlighting with customizable color
+- Copy to clipboard functionality
+- Works seamlessly with ruby annotations, kenten marks, and warichu
+
 ## [0.6.0] - 2026-01-10
 
 ### Added

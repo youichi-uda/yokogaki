@@ -305,6 +305,41 @@ class HomePage extends StatelessWidget {
                 rubyStyle: const TextStyle(fontSize: 14, color: Colors.deepOrange),
               ),
             ),
+            const SizedBox(height: 32),
+            const Text(
+              'Selectable Text - Drag to Select',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tap or drag to select text. Long press to copy.',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            SelectableHorizontalText(
+              text: 'これは選択可能なテキストです。ドラッグして選択してください。',
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 24),
+              ),
+              maxWidth: 350,
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Selectable Text - With Ruby',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            SelectableHorizontalText(
+              text: '日本語の選択可能なテキスト',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+                RubyText(startIndex: 4, length: 4, ruby: 'せんたくかのう'),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+                rubyStyle: const TextStyle(fontSize: 14, color: Colors.blue),
+              ),
+            ),
           ],
         ),
       ),
