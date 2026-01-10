@@ -149,8 +149,8 @@ class RubyRenderer {
           // Ruby should be above kenten: lineY - kentenSize + 5 (kenten gap) - rubyFontSize - 4 (ruby gap + 2px extra)
           rubyY = lineY - kentenSize + 5.0 - rubyFontSize - 4.0;
         } else {
-          // Ruby directly above text
-          rubyY = lineY - rubyFontSize - 2.0; // 2px gap
+          // Ruby directly above text (closer to text)
+          rubyY = lineY - rubyFontSize + 2.0; // -2px gap (closer)
         }
 
         layouts.add(RubyLayout(
