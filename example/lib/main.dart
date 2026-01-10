@@ -229,6 +229,82 @@ class HomePage extends StatelessWidget {
                 rubyStyle: TextStyle(fontSize: 12, color: Colors.purple),
               ),
             ),
+            const SizedBox(height: 32),
+            const Text(
+              'Rich Text - Multiple Styles',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            HorizontalRichText(
+              span: GroupHorizontalTextSpan(
+                children: [
+                  SimpleHorizontalTextSpan(
+                    text: 'これは',
+                    style: const TextStyle(fontSize: 24, color: Colors.black),
+                  ),
+                  SimpleHorizontalTextSpan(
+                    text: '重要',
+                    style: const TextStyle(fontSize: 24, color: Colors.red, fontWeight: FontWeight.bold),
+                    kentenList: const [
+                      Kenten(startIndex: 0, length: 2, type: KentenType.filledCircle),
+                    ],
+                  ),
+                  SimpleHorizontalTextSpan(
+                    text: 'な',
+                    style: const TextStyle(fontSize: 24, color: Colors.black),
+                  ),
+                  SimpleHorizontalTextSpan(
+                    text: 'テキスト',
+                    style: const TextStyle(fontSize: 24, color: Colors.blue, fontStyle: FontStyle.italic),
+                  ),
+                  SimpleHorizontalTextSpan(
+                    text: 'です。',
+                    style: const TextStyle(fontSize: 24, color: Colors.black),
+                  ),
+                ],
+              ),
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 24),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Rich Text - With Ruby',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            HorizontalRichText(
+              span: GroupHorizontalTextSpan(
+                children: [
+                  SimpleHorizontalTextSpan(
+                    text: '日本語',
+                    style: const TextStyle(fontSize: 28, color: Colors.black),
+                    rubyList: const [
+                      RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+                    ],
+                  ),
+                  SimpleHorizontalTextSpan(
+                    text: 'は',
+                    style: const TextStyle(fontSize: 28, color: Colors.black),
+                  ),
+                  SimpleHorizontalTextSpan(
+                    text: '美しい',
+                    style: const TextStyle(fontSize: 28, color: Colors.pink, fontWeight: FontWeight.bold),
+                    rubyList: const [
+                      RubyText(startIndex: 0, length: 3, ruby: 'うつく'),
+                    ],
+                  ),
+                  SimpleHorizontalTextSpan(
+                    text: 'です。',
+                    style: const TextStyle(fontSize: 28, color: Colors.black),
+                  ),
+                ],
+              ),
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+                rubyStyle: const TextStyle(fontSize: 14, color: Colors.deepOrange),
+              ),
+            ),
           ],
         ),
       ),

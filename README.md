@@ -32,7 +32,11 @@ Flutter package for Japanese horizontal text (yokogaki - 横書き) layout with 
   - Displayed inline with main text
   - Combine with ruby and kenten
 
-- **Rich Text**: Multiple styles in one text block (planned)
+- **Rich Text**: Multiple styles in one text block
+  - Span-based architecture for hierarchical text
+  - Mix multiple colors, fonts, sizes, and weights
+  - Per-span ruby, kenten, and warichu annotations
+  - Powerful text composition with `SimpleHorizontalTextSpan` and `GroupHorizontalTextSpan`
 
 ## Installation
 
@@ -215,6 +219,80 @@ HorizontalText(
 )
 ```
 
+### Rich Text - Multiple Styles
+
+```dart
+HorizontalRichText(
+  span: GroupHorizontalTextSpan(
+    children: [
+      SimpleHorizontalTextSpan(
+        text: 'これは',
+        style: TextStyle(fontSize: 24, color: Colors.black),
+      ),
+      SimpleHorizontalTextSpan(
+        text: '重要',
+        style: TextStyle(fontSize: 24, color: Colors.red, fontWeight: FontWeight.bold),
+        kentenList: const [
+          Kenten(startIndex: 0, length: 2, type: KentenType.filledCircle),
+        ],
+      ),
+      SimpleHorizontalTextSpan(
+        text: 'な',
+        style: TextStyle(fontSize: 24, color: Colors.black),
+      ),
+      SimpleHorizontalTextSpan(
+        text: 'テキスト',
+        style: TextStyle(fontSize: 24, color: Colors.blue, fontStyle: FontStyle.italic),
+      ),
+      SimpleHorizontalTextSpan(
+        text: 'です。',
+        style: TextStyle(fontSize: 24, color: Colors.black),
+      ),
+    ],
+  ),
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 24),
+  ),
+)
+```
+
+### Rich Text - With Ruby
+
+```dart
+HorizontalRichText(
+  span: GroupHorizontalTextSpan(
+    children: [
+      SimpleHorizontalTextSpan(
+        text: '日本語',
+        style: TextStyle(fontSize: 28, color: Colors.black),
+        rubyList: const [
+          RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+        ],
+      ),
+      SimpleHorizontalTextSpan(
+        text: 'は',
+        style: TextStyle(fontSize: 28, color: Colors.black),
+      ),
+      SimpleHorizontalTextSpan(
+        text: '美しい',
+        style: TextStyle(fontSize: 28, color: Colors.pink, fontWeight: FontWeight.bold),
+        rubyList: const [
+          RubyText(startIndex: 0, length: 3, ruby: 'うつく'),
+        ],
+      ),
+      SimpleHorizontalTextSpan(
+        text: 'です。',
+        style: TextStyle(fontSize: 28, color: Colors.black),
+      ),
+    ],
+  ),
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 28),
+    rubyStyle: TextStyle(fontSize: 14, color: Colors.deepOrange),
+  ),
+)
+```
+
 ### Debug Grid
 
 ```dart
@@ -240,8 +318,9 @@ See the [example](example/) directory for a complete demo app showcasing all fea
 - [x] Ruby text (furigana) support
 - [x] Kenten (emphasis marks)
 - [x] Warichu (inline annotations)
-- [ ] Rich text with multiple styles
+- [x] Rich text with multiple styles
 - [ ] Text selection support
+- [ ] Performance optimizations
 
 ## Related Packages
 

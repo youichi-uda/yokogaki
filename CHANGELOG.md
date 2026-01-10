@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-01-10
+
+### Added
+- **Rich text support with multiple styles**
+  - `HorizontalTextSpan` base class for span hierarchy
+  - `SimpleHorizontalTextSpan` for single-style text with annotations
+  - `GroupHorizontalTextSpan` for grouping multiple spans
+  - `HorizontalRichText` widget for rendering multi-style text
+  - `HorizontalRichTextPainter` for rendering spans with different styles
+  - Per-span ruby, kenten, and warichu annotations
+  - Support for mixing multiple text styles, colors, fonts, and weights
+- Rich text examples in demo app showing multiple styles and combinations
+
+### Changed
+- Added `TextSpanData` class for flattening span hierarchies
+- Added `StyleRange` class for tracking style ranges in rich text
+
 ## [0.4.0] - 2026-01-10
 
 ### Added
