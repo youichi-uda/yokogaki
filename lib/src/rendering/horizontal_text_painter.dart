@@ -1,0 +1,87 @@
+import 'package:flutter/material.dart';
+import '../models/horizontal_text_style.dart';
+import 'horizontal_text_layouter.dart';
+
+/// Custom painter for horizontal Japanese text
+class HorizontalTextPainter extends CustomPainter {
+  final String text;
+  final HorizontalTextStyle style;
+  final double maxWidth;
+  final bool showGrid;
+
+  HorizontalTextPainter({
+    required this.text,
+    required this.style,
+    this.maxWidth = 0,
+    this.showGrid = false,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (text.isEmpty) return;
+
+    // Layout the text
+    final layouts = HorizontalTextLayouter.layout(
+      text: text,
+      style: style,
+      maxWidth: maxWidth,
+    );
+
+    final fontSize = style.baseStyle.fontSize ?? 16.0;
+
+    // Draw grid if enabled (for debugging)
+    if (showGrid) {
+      _drawGrid(canvas, size, fontSize);
+    }
+
+    // Draw each character
+    for (final layout in layouts) {
+      _drawCharacter(canvas, layout, fontSize);
+    }
+  }
+
+  void _drawCharacter(Canvas canvas, CharacterLayout layout, double fontSize) {
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: layout.character,
+        style: style.baseStyle,
+      ),
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout();
+    textPainter.paint(canvas, layout.position);
+  }
+
+  void _drawGrid(Canvas canvas, Size size, double fontSize) {
+    final paint = Paint()
+      ..color = Colors.grey.withValues(alpha: 0.3)
+      ..strokeWidth = 0.5;
+
+    // Draw vertical lines (columns)
+    for (double x = 0; x < size.width; x += fontSize) {
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x, size.height),
+        paint,
+      );
+    }
+
+    // Draw horizontal lines (rows)
+    for (double y = 0; y < size.height; y += fontSize) {
+      canvas.drawLine(
+        Offset(0, y),
+        Offset(size.width, y),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(HorizontalTextPainter oldDelegate) {
+    return text != oldDelegate.text ||
+        style != oldDelegate.style ||
+        maxWidth != oldDelegate.maxWidth ||
+        showGrid != oldDelegate.showGrid;
+  }
+}

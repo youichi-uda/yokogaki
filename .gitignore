@@ -1,0 +1,16 @@
+# Files and directories created by dart/pub
+.dart_tool/
+.packages
+build/
+pubspec.lock
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
