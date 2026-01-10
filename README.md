@@ -51,7 +51,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  yokogaki: ^0.1.0
+  yokogaki: ^0.7.0
 ```
 
 Then run:
