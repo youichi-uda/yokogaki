@@ -128,8 +128,8 @@ class HorizontalRichTextPainter extends CustomPainter {
 
   void _drawGrid(Canvas canvas, Size size, double fontSize) {
     final paint = Paint()
-      ..color = Colors.grey.withValues(alpha: 0.3)
-      ..strokeWidth = 0.5;
+      ..color = Colors.blue.withValues(alpha: 0.5)
+      ..strokeWidth = 1.0;
 
     // Draw vertical lines (columns)
     for (double x = 0; x < size.width; x += fontSize) {
