@@ -65,6 +65,7 @@ class HorizontalTextLayouter {
     double currentX = 0.0; // Horizontal position (increases to the right)
     double currentY = 0.0; // Vertical position (increases downward for new lines)
     int lineStartIndex = 0;
+    bool shouldBreakAfterCurrentChar = false; // Flag for burasage (hanging)
 
     for (int i = 0; i < text.length; i++) {
       final char = text[i];
@@ -72,17 +73,15 @@ class HorizontalTextLayouter {
       // Check if we need to break the line
       if (maxWidth > 0 && currentX + fontSize > maxWidth) {
         if (style.enableKinsoku) {
-          // Find the best break position using kinsoku rules
-          int breakPos = KinsokuProcessor.findBreakPosition(text.substring(lineStartIndex, i + 1), i - lineStartIndex);
-          int actualBreakPos = lineStartIndex + breakPos;
+          // First check if current character can hang at line end (burasage)
+          if (KinsokuProcessor.canHangAtLineEnd(char)) {
+            // Allow character to hang - draw it, then break after
+            shouldBreakAfterCurrentChar = true;
+          } else {
+            // Cannot hang - need to find proper break position
+            int breakPos = KinsokuProcessor.findBreakPosition(text.substring(lineStartIndex, i + 1), i - lineStartIndex);
+            int actualBreakPos = lineStartIndex + breakPos;
 
-          // Check if current character can hang at line end
-          bool shouldHang = false;
-          if (actualBreakPos == i && KinsokuProcessor.canHangAtLineEnd(char)) {
-            shouldHang = true;
-          }
-
-          if (!shouldHang) {
             // If break position is before current position, need to move some characters to next line
             if (actualBreakPos < i) {
               // Remove layouts from actualBreakPos onwards
@@ -112,11 +111,6 @@ class HorizontalTextLayouter {
               currentY += fontSize + style.lineSpacing;
               lineStartIndex = i;
             }
-          } else {
-            // shouldHang is true - let the character hang, but move to next line for subsequent characters
-            currentX = 0.0;
-            currentY += fontSize + style.lineSpacing;
-            lineStartIndex = i + 1;
           }
         } else {
           // Simple line breaking without kinsoku
@@ -142,6 +136,14 @@ class HorizontalTextLayouter {
           : fontSize;
 
       currentX += charWidth + style.characterSpacing;
+
+      // Check if we should break after this character (burasage case)
+      if (shouldBreakAfterCurrentChar) {
+        currentX = 0.0;
+        currentY += fontSize + style.lineSpacing;
+        lineStartIndex = i + 1;
+        shouldBreakAfterCurrentChar = false;
+      }
     }
 
     // Store in cache if enabled
