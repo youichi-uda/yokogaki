@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kinsoku/kinsoku.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
@@ -112,14 +113,25 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       ..color = selectionColor
       ..style = PaintingStyle.fill;
 
+    // Measure actual text height using TextPainter
+    final textPainter = TextPainter(
+      text: TextSpan(text: 'あ', style: style.baseStyle),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    final actualTextHeight = textPainter.height;
+
     for (final layout in layouts) {
       final index = layout.textIndex;
       if (index >= start && index < end) {
+        final charWidth = YakumonoAdjuster.isHalfWidthYakumono(layout.character)
+            ? fontSize * 0.5
+            : fontSize;
         final rect = Rect.fromLTWH(
           layout.position.dx,
           layout.position.dy,
-          fontSize,
-          fontSize,
+          charWidth,
+          actualTextHeight,
         );
         canvas.drawRect(rect, paint);
       }
@@ -146,6 +158,14 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       ..color = Colors.blue.withValues(alpha: 0.5)
       ..strokeWidth = 1.0;
 
+    // Measure actual text height using TextPainter
+    final textPainter = TextPainter(
+      text: TextSpan(text: 'あ', style: style.baseStyle),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    final actualTextHeight = textPainter.height;
+
     // Draw vertical lines (columns)
     for (double x = 0; x <= size.width; x += fontSize) {
       canvas.drawLine(
@@ -155,8 +175,9 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       );
     }
 
-    // Draw horizontal lines (rows)
-    for (double y = 0; y <= size.height; y += fontSize) {
+    // Draw horizontal lines (rows) using actual text height + line spacing
+    final lineHeight = actualTextHeight + style.lineSpacing;
+    for (double y = 0; y <= size.height; y += lineHeight) {
       canvas.drawLine(
         Offset(0, y),
         Offset(size.width, y),

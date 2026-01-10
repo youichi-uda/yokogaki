@@ -203,6 +203,14 @@ class HorizontalTextLayouter {
 
     final fontSize = style.baseStyle.fontSize ?? 16.0;
 
+    // Measure actual text height using TextPainter
+    final textPainter = TextPainter(
+      text: TextSpan(text: 'あ', style: style.baseStyle),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    final actualTextHeight = textPainter.height;
+
     // Find the rightmost and bottommost positions
     double maxX = 0.0;
     double maxY = 0.0;
@@ -212,7 +220,7 @@ class HorizontalTextLayouter {
           ? fontSize * 0.5
           : fontSize;
       maxX = (layout.position.dx + charWidth).clamp(maxX, double.infinity);
-      maxY = (layout.position.dy + fontSize).clamp(maxY, double.infinity);
+      maxY = (layout.position.dy + actualTextHeight).clamp(maxY, double.infinity);
     }
 
     return Size(maxX, maxY);
