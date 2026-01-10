@@ -352,6 +352,33 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
+              'Debug: Character indices',
+              style: TextStyle(fontSize: 14, color: Colors.orange, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: '01234567890123456789',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 1, ruby: '0'),
+                RubyText(startIndex: 5, length: 1, ruby: '5'),
+                RubyText(startIndex: 10, length: 1, ruby: 'A'),
+                RubyText(startIndex: 15, length: 1, ruby: 'F'),
+              ],
+              kentenList: const [
+                Kenten(startIndex: 2, length: 1, type: KentenType.filledCircle),
+                Kenten(startIndex: 7, length: 1, type: KentenType.filledCircle),
+                Kenten(startIndex: 12, length: 1, type: KentenType.filledCircle),
+                Kenten(startIndex: 17, length: 1, type: KentenType.filledCircle),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 24, color: Colors.grey),
+                rubyStyle: const TextStyle(fontSize: 12, color: Colors.red),
+                lineSpacing: 16.0,
+              ),
+              maxWidth: 400,
+            ),
+            const SizedBox(height: 16),
+            const Text(
               '1. Kenten only:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
