@@ -83,10 +83,35 @@ class HorizontalTextLayouter {
           }
 
           if (!shouldHang) {
-            // Move to next line
-            currentX = 0.0;
-            currentY += fontSize + style.lineSpacing;
-            lineStartIndex = i;
+            // If break position is before current position, need to move some characters to next line
+            if (actualBreakPos < i) {
+              // Remove layouts from actualBreakPos onwards
+              layouts.removeWhere((layout) => layout.textIndex >= actualBreakPos);
+
+              // Reset current position to beginning of new line
+              currentX = 0.0;
+              currentY += fontSize + style.lineSpacing;
+              lineStartIndex = actualBreakPos;
+
+              // Re-layout characters from actualBreakPos to i-1 on the new line
+              for (int j = actualBreakPos; j < i; j++) {
+                final reChar = text[j];
+                layouts.add(CharacterLayout(
+                  character: reChar,
+                  position: Offset(currentX, currentY),
+                  textIndex: j,
+                ));
+                double charWidth = YakumonoAdjuster.isHalfWidthYakumono(reChar) && style.enableHalfWidthYakumono
+                    ? fontSize * 0.5
+                    : fontSize;
+                currentX += charWidth + style.characterSpacing;
+              }
+            } else {
+              // Break at current position
+              currentX = 0.0;
+              currentY += fontSize + style.lineSpacing;
+              lineStartIndex = i;
+            }
           } else {
             // shouldHang is true - let the character hang, but move to next line for subsequent characters
             currentX = 0.0;
