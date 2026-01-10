@@ -5,6 +5,29 @@ import '../models/kenten.dart';
 import '../models/horizontal_text_style.dart';
 import '../rendering/horizontal_text_layouter.dart';
 
+/// Get actual character width
+double _getCharacterWidth(String character, HorizontalTextStyle style) {
+  final fontSize = style.baseStyle.fontSize ?? 16.0;
+
+  // Check half-width yakumono
+  if (YakumonoAdjuster.isHalfWidthYakumono(character) && style.enableHalfWidthYakumono) {
+    return fontSize * 0.5;
+  }
+
+  // For ASCII characters, measure actual width
+  if (character.codeUnitAt(0) < 128) {
+    final textPainter = TextPainter(
+      text: TextSpan(text: character, style: style.baseStyle),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    return textPainter.width;
+  }
+
+  // Default to full width
+  return fontSize;
+}
+
 /// Layout information for a single kenten mark
 class KentenLayout {
   /// Position to draw the kenten mark
@@ -41,10 +64,8 @@ class KentenRenderer {
       for (final charLayout in layouts) {
         final charIndex = charLayout.textIndex;
         if (charIndex >= kenten.startIndex && charIndex < kenten.endIndex) {
-          // Calculate actual character width (considering half-width yakumono)
-          final charWidth = (YakumonoAdjuster.isHalfWidthYakumono(charLayout.character) && style.enableHalfWidthYakumono)
-              ? fontSize * 0.5
-              : fontSize;
+          // Get actual character width
+          final charWidth = _getCharacterWidth(charLayout.character, style);
 
           // Position kenten mark above the character
           // For horizontal text: above = Y - kentenSize - gap
