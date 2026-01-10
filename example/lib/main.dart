@@ -129,8 +129,8 @@ class HomePage extends StatelessWidget {
             HorizontalText(
               text: '重要な部分を強調します。',
               kentenList: const [
-                Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
-                Kenten(startIndex: 5, length: 2, type: KentenType.filledCircle),
+                Kenten(startIndex: 0, length: 2, type: KentenType.sesame), // 重要
+                Kenten(startIndex: 3, length: 2, type: KentenType.filledCircle), // 部分
               ],
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 28),
