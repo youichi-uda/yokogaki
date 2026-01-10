@@ -119,7 +119,7 @@ class RubyRenderer {
         final baseX = firstChar.position.dx;
 
         // Calculate last character width (considering half-width yakumono)
-        final lastCharWidth = YakumonoAdjuster.isHalfWidthYakumono(lastChar.character)
+        final lastCharWidth = (YakumonoAdjuster.isHalfWidthYakumono(lastChar.character) && style.enableHalfWidthYakumono)
             ? baseFontSize * 0.5
             : baseFontSize;
 

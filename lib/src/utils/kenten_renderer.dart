@@ -42,7 +42,7 @@ class KentenRenderer {
         final charIndex = charLayout.textIndex;
         if (charIndex >= kenten.startIndex && charIndex < kenten.endIndex) {
           // Calculate actual character width (considering half-width yakumono)
-          final charWidth = YakumonoAdjuster.isHalfWidthYakumono(charLayout.character)
+          final charWidth = (YakumonoAdjuster.isHalfWidthYakumono(charLayout.character) && style.enableHalfWidthYakumono)
               ? fontSize * 0.5
               : fontSize;
 
