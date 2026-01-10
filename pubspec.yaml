@@ -1,6 +1,6 @@
 name: yokogaki
 description: Flutter package for Japanese horizontal text (yokogaki) layout with ruby, kenten, warichu, and rich text support
-version: 0.8.0
+version: 0.9.0
 repository: https://github.com/youichi-uda/yokogaki
 
 environment:
@@ -10,8 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  kinsoku:
-    path: ../kinsoku
+  kinsoku: ^0.3.0
 
 dev_dependencies:
   flutter_test:
