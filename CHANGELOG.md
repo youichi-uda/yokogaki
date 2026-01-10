@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-01-10
+
+### Added
+- **Enhanced text selection with draggable handles**
+  - Visual selection handles at start and end of selection
+  - Drag handles to adjust selection range
+  - Larger touch targets (24px) for better usability on mobile
+  - Nearest character detection when dragging handles
+- **Standard context menu features**
+  - Right-click context menu (desktop)
+  - Long-press context menu (mobile)
+  - Context menu shown on selection tap and after drag selection
+  - Keyboard shortcuts: Ctrl+C (copy), Ctrl+A (select all)
+  - Double-click to select all
+  - Theme-based selection and handle colors
+- **Extensible context menu**
+  - `additionalMenuItems` parameter to add custom menu items
+  - Custom items receive context and selected text
+  - Automatically adds divider between default and custom items
+- **Multi-language support**
+  - `copyLabel` and `selectAllLabel` parameters for custom labels
+  - Auto-detects locale: Japanese (複製/すべて選択) or English (Copy/Select All)
+  - Easy localization for any language
+
+### Fixed
+- **Grid and selection highlighting positioning**
+  - Now uses actual text height from TextPainter instead of fontSize
+  - Grid lines align correctly with rendered characters
+  - Selection highlights extend to full character height
+  - Fixed horizontal grid line spacing to use actualTextHeight + lineSpacing
+
+### Changed
+- Selection behavior now matches standard apps like Chrome
+- Context menu appears automatically after text selection
+- Default menu items (Copy, Select All) always present with custom items appended
+
 ## [0.7.0] - 2026-01-10
 
 ### Added
