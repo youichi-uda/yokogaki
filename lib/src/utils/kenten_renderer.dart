@@ -44,7 +44,7 @@ class KentenRenderer {
           // For horizontal text: above = Y - kentenSize - gap
           final kentenPosition = Offset(
             charLayout.position.dx + (fontSize - kentenSize) / 2, // Center horizontally
-            charLayout.position.dy - kentenSize - 1, // Above character with 1px gap
+            charLayout.position.dy - kentenSize + 5, // Above character with -5px gap (closer overlap)
           );
 
           kentenLayouts.add(KentenLayout(
