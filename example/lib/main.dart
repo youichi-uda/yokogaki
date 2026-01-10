@@ -86,6 +86,40 @@ class HomePage extends StatelessWidget {
               ),
               maxWidth: 350,
             ),
+            const SizedBox(height: 32),
+            const Text(
+              'With Ruby (Furigana)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            HorizontalText(
+              text: '日本語',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 32),
+                rubyStyle: TextStyle(fontSize: 14, color: Colors.red),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Ruby with Line Breaking',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            HorizontalText(
+              text: '漢字はとても難しいです。',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 2, ruby: 'かんじ'),
+                RubyText(startIndex: 5, length: 2, ruby: 'むずか'),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 24),
+                rubyStyle: TextStyle(fontSize: 12, color: Colors.blue),
+              ),
+              maxWidth: 300,
+            ),
           ],
         ),
       ),

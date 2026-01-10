@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
+import '../models/ruby_text.dart';
 import '../rendering/horizontal_text_painter.dart';
 import '../rendering/horizontal_text_layouter.dart';
 
@@ -24,12 +25,16 @@ class HorizontalText extends StatelessWidget {
   /// Whether to show a debug grid
   final bool showGrid;
 
+  /// Ruby text annotations
+  final List<RubyText> rubyList;
+
   const HorizontalText({
     super.key,
     required this.text,
     this.style = const HorizontalTextStyle(),
     this.maxWidth = 0,
     this.showGrid = false,
+    this.rubyList = const [],
   });
 
   @override
@@ -48,6 +53,7 @@ class HorizontalText extends StatelessWidget {
         style: style,
         maxWidth: maxWidth,
         showGrid: showGrid,
+        rubyList: rubyList,
       ),
     );
   }

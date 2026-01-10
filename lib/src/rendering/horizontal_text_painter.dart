@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
+import '../models/ruby_text.dart';
 import 'horizontal_text_layouter.dart';
+import '../utils/ruby_renderer.dart';
 
 /// Custom painter for horizontal Japanese text
 class HorizontalTextPainter extends CustomPainter {
@@ -8,12 +10,14 @@ class HorizontalTextPainter extends CustomPainter {
   final HorizontalTextStyle style;
   final double maxWidth;
   final bool showGrid;
+  final List<RubyText> rubyList;
 
   HorizontalTextPainter({
     required this.text,
     required this.style,
     this.maxWidth = 0,
     this.showGrid = false,
+    this.rubyList = const [],
   });
 
   @override
@@ -34,9 +38,19 @@ class HorizontalTextPainter extends CustomPainter {
       _drawGrid(canvas, size, fontSize);
     }
 
+    // Layout ruby text if any
+    final rubyLayouts = rubyList.isNotEmpty
+        ? RubyRenderer.layoutRuby(text, rubyList, style, layouts)
+        : <RubyLayout>[];
+
     // Draw each character
     for (final layout in layouts) {
       _drawCharacter(canvas, layout, fontSize);
+    }
+
+    // Draw ruby text
+    if (rubyLayouts.isNotEmpty) {
+      RubyRenderer.render(canvas, rubyLayouts, style);
     }
   }
 
@@ -82,6 +96,7 @@ class HorizontalTextPainter extends CustomPainter {
     return text != oldDelegate.text ||
         style != oldDelegate.style ||
         maxWidth != oldDelegate.maxWidth ||
-        showGrid != oldDelegate.showGrid;
+        showGrid != oldDelegate.showGrid ||
+        rubyList != oldDelegate.rubyList;
   }
 }

@@ -14,10 +14,14 @@ class CharacterLayout {
   /// Ruby text for this character (if any)
   final RubyText? ruby;
 
+  /// Index in the original text
+  final int textIndex;
+
   CharacterLayout({
     required this.character,
     required this.position,
     this.ruby,
+    required this.textIndex,
   });
 }
 
@@ -88,6 +92,7 @@ class HorizontalTextLayouter {
       layouts.add(CharacterLayout(
         character: char,
         position: position,
+        textIndex: i,
       ));
 
       // Advance horizontal position
