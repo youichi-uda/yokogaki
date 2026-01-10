@@ -63,9 +63,7 @@ class RubyRenderer {
       // Find all character layouts in this ruby range
       final baseLayouts = <CharacterLayout>[];
       for (final layout in characterLayouts) {
-        // Note: We need to add textIndex to CharacterLayout
-        // For now, use index from characterLayouts
-        final textIndex = characterLayouts.indexOf(layout);
+        final textIndex = layout.textIndex;
         if (textIndex >= ruby.startIndex &&
             textIndex < ruby.startIndex + ruby.length) {
           baseLayouts.add(layout);
