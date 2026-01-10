@@ -3,6 +3,7 @@ import 'package:kinsoku/kinsoku.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
+import '../models/text_decoration.dart';
 import '../rendering/horizontal_text_layouter.dart';
 
 /// Get actual character width
@@ -62,6 +63,24 @@ class RubyRenderer {
     return false;
   }
 
+  /// Check if a character index has overline decoration
+  static bool _hasOverline(int charIndex, List<TextDecorationAnnotation>? decorationList) {
+    if (decorationList == null || decorationList.isEmpty) return false;
+
+    for (final decoration in decorationList) {
+      if (charIndex >= decoration.startIndex && charIndex < decoration.endIndex) {
+        // Check if it's an overline type
+        if (decoration.type == TextDecorationLineType.overline ||
+            decoration.type == TextDecorationLineType.doubleOverline ||
+            decoration.type == TextDecorationLineType.wavyOverline ||
+            decoration.type == TextDecorationLineType.dottedOverline) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /// Layout ruby text for given base text
   ///
   /// [baseText] The base text
@@ -69,6 +88,7 @@ class RubyRenderer {
   /// [style] Text style configuration
   /// [characterLayouts] Character layouts from HorizontalTextLayouter
   /// [kentenList] Optional list of kenten marks to avoid overlap
+  /// [decorationList] Optional list of decorations to avoid overlap
   ///
   /// Returns list of ruby layouts
   static List<RubyLayout> layoutRuby(
@@ -77,6 +97,7 @@ class RubyRenderer {
     HorizontalTextStyle style,
     List<CharacterLayout> characterLayouts, {
     List<dynamic>? kentenList,
+    List<TextDecorationAnnotation>? decorationList,
   }) {
     final layouts = <RubyLayout>[];
     final baseFontSize = style.baseStyle.fontSize ?? 16.0;
@@ -170,11 +191,24 @@ class RubyRenderer {
           }
         }
 
+        // Check if any character in this line has overline decoration
+        bool hasOverlineInLine = false;
+        for (final charLayout in lineChars) {
+          final charIndex = charLayout.textIndex;
+          if (_hasOverline(charIndex, decorationList)) {
+            hasOverlineInLine = true;
+            break;
+          }
+        }
+
         // Place ruby above the base text
-        // If kenten marks exist, place ruby above them
+        // If kenten marks or overline exist, place ruby above them
         double rubyY;
         if (hasKentenInLine) {
           // Ruby should be above kenten: lineY - kentenSize + 8 (kenten gap) - rubyFontSize - 2 (close)
+          rubyY = lineY - kentenSize + 8.0 - rubyFontSize - 2.0;
+        } else if (hasOverlineInLine) {
+          // Ruby should be above overline (same adjustment as kenten)
           rubyY = lineY - kentenSize + 8.0 - rubyFontSize - 2.0;
         } else {
           // Ruby directly above text (closer to text)

@@ -759,6 +759,58 @@ class _HomePageState extends State<HomePage> {
                 rubyStyle: const TextStyle(fontSize: 14, color: Colors.green),
               ),
             ),
+            const SizedBox(height: 16),
+            const Text(
+              '5. Ruby + Overline:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: '重要な言葉を強調',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 2, ruby: 'じゅうよう'),
+                RubyText(startIndex: 3, length: 2, ruby: 'ことば'),
+                RubyText(startIndex: 6, length: 2, ruby: 'きょうちょう'),
+              ],
+              decorationList: const [
+                TextDecorationAnnotation(
+                  startIndex: 0,
+                  length: 2,
+                  type: TextDecorationLineType.overline,
+                  color: Colors.blue,
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+                rubyStyle: const TextStyle(fontSize: 14, color: Colors.purple),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              '6. Ruby + Wavy Overline:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: '日本語の勉強は楽しい',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+                RubyText(startIndex: 4, length: 2, ruby: 'べんきょう'),
+                RubyText(startIndex: 7, length: 2, ruby: 'たの'),
+              ],
+              decorationList: const [
+                TextDecorationAnnotation(
+                  startIndex: 4,
+                  length: 2,
+                  type: TextDecorationLineType.wavyOverline,
+                  color: Colors.orange,
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+                rubyStyle: const TextStyle(fontSize: 14, color: Colors.teal),
+              ),
+            ),
             const SizedBox(height: 32),
           ],
         ),

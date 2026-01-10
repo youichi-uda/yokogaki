@@ -58,6 +58,7 @@ class HorizontalTextPainter extends CustomPainter {
             style,
             layouts,
             kentenList: kentenList,
+            decorationList: decorationList.isNotEmpty ? decorationList : null,
           )
         : <RubyLayout>[];
 
