@@ -21,6 +21,8 @@ class SelectableHorizontalTextPainter extends CustomPainter {
   final int? selectionStart;
   final int? selectionEnd;
   final Color selectionColor;
+  final Color handleColor;
+  final bool showHandles;
   final void Function(List<CharacterLayout>)? onLayoutsCalculated;
 
   SelectableHorizontalTextPainter({
@@ -34,6 +36,8 @@ class SelectableHorizontalTextPainter extends CustomPainter {
     this.selectionStart,
     this.selectionEnd,
     this.selectionColor = const Color(0x6633B5E5),
+    this.handleColor = const Color(0xFF2196F3),
+    this.showHandles = true,
     this.onLayoutsCalculated,
   });
 
@@ -103,6 +107,110 @@ class SelectableHorizontalTextPainter extends CustomPainter {
     if (warichuLayouts.isNotEmpty) {
       WarichuRenderer.render(canvas, warichuLayouts, style);
     }
+
+    // Draw selection handles
+    if (showHandles && selectionStart != null && selectionEnd != null) {
+      _drawSelectionHandles(canvas, layouts, fontSize);
+    }
+  }
+
+  void _drawSelectionHandles(Canvas canvas, List<CharacterLayout> layouts, double fontSize) {
+    final start = selectionStart! < selectionEnd! ? selectionStart! : selectionEnd!;
+    final end = selectionStart! < selectionEnd! ? selectionEnd! : selectionStart!;
+
+    if (end - start == 0) return;
+
+    // Find start and end character layouts
+    CharacterLayout? startLayout;
+    CharacterLayout? endLayout;
+
+    for (final layout in layouts) {
+      if (layout.textIndex == start) {
+        startLayout = layout;
+      }
+      if (layout.textIndex == end - 1) {
+        endLayout = layout;
+      }
+    }
+
+    // Measure actual text height
+    final textPainter = TextPainter(
+      text: TextSpan(text: 'あ', style: style.baseStyle),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    final actualTextHeight = textPainter.height;
+
+    const handleRadius = 6.0;
+    const handleLineHeight = 20.0;
+
+    // Draw start handle
+    if (startLayout != null) {
+      _drawHandle(
+        canvas,
+        Offset(startLayout.position.dx, startLayout.position.dy),
+        actualTextHeight,
+        handleRadius,
+        handleLineHeight,
+        isStart: true,
+      );
+    }
+
+    // Draw end handle
+    if (endLayout != null) {
+      final charWidth = YakumonoAdjuster.isHalfWidthYakumono(endLayout.character)
+          ? fontSize * 0.5
+          : fontSize;
+      _drawHandle(
+        canvas,
+        Offset(endLayout.position.dx + charWidth, endLayout.position.dy),
+        actualTextHeight,
+        handleRadius,
+        handleLineHeight,
+        isStart: false,
+      );
+    }
+  }
+
+  void _drawHandle(
+    Canvas canvas,
+    Offset position,
+    double textHeight,
+    double radius,
+    double lineHeight,
+    {required bool isStart}
+  ) {
+    final paint = Paint()
+      ..color = handleColor
+      ..style = PaintingStyle.fill;
+
+    // Draw vertical line
+    final lineStart = Offset(position.dx, position.dy);
+    final lineEnd = Offset(position.dx, position.dy + textHeight);
+    canvas.drawLine(
+      lineStart,
+      lineEnd,
+      Paint()
+        ..color = handleColor
+        ..strokeWidth = 2.0,
+    );
+
+    // Draw circle handle at bottom
+    final handleCenter = Offset(
+      position.dx,
+      position.dy + textHeight + radius,
+    );
+    canvas.drawCircle(handleCenter, radius, paint);
+
+    // Draw white border
+    canvas.drawCircle(
+      handleCenter,
+      radius,
+      Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
   }
 
   void _drawSelection(Canvas canvas, List<CharacterLayout> layouts, double fontSize) {
@@ -197,6 +305,8 @@ class SelectableHorizontalTextPainter extends CustomPainter {
         warichuList != oldDelegate.warichuList ||
         selectionStart != oldDelegate.selectionStart ||
         selectionEnd != oldDelegate.selectionEnd ||
-        selectionColor != oldDelegate.selectionColor;
+        selectionColor != oldDelegate.selectionColor ||
+        handleColor != oldDelegate.handleColor ||
+        showHandles != oldDelegate.showHandles;
   }
 }
