@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
+import '../models/kenten.dart';
 import 'horizontal_text_layouter.dart';
 import '../utils/ruby_renderer.dart';
+import '../utils/kenten_renderer.dart';
 
 /// Custom painter for horizontal Japanese text
 class HorizontalTextPainter extends CustomPainter {
@@ -11,6 +13,7 @@ class HorizontalTextPainter extends CustomPainter {
   final double maxWidth;
   final bool showGrid;
   final List<RubyText> rubyList;
+  final List<Kenten> kentenList;
 
   HorizontalTextPainter({
     required this.text,
@@ -18,6 +21,7 @@ class HorizontalTextPainter extends CustomPainter {
     this.maxWidth = 0,
     this.showGrid = false,
     this.rubyList = const [],
+    this.kentenList = const [],
   });
 
   @override
@@ -43,6 +47,11 @@ class HorizontalTextPainter extends CustomPainter {
         ? RubyRenderer.layoutRuby(text, rubyList, style, layouts)
         : <RubyLayout>[];
 
+    // Layout kenten marks if any
+    final kentenLayouts = kentenList.isNotEmpty
+        ? KentenRenderer.layoutKenten(text, kentenList, style, layouts)
+        : <KentenLayout>[];
+
     // Draw each character
     for (final layout in layouts) {
       _drawCharacter(canvas, layout, fontSize);
@@ -51,6 +60,11 @@ class HorizontalTextPainter extends CustomPainter {
     // Draw ruby text
     if (rubyLayouts.isNotEmpty) {
       RubyRenderer.render(canvas, rubyLayouts, style);
+    }
+
+    // Draw kenten marks
+    if (kentenLayouts.isNotEmpty) {
+      KentenRenderer.render(canvas, kentenLayouts, style);
     }
   }
 
@@ -97,6 +111,7 @@ class HorizontalTextPainter extends CustomPainter {
         style != oldDelegate.style ||
         maxWidth != oldDelegate.maxWidth ||
         showGrid != oldDelegate.showGrid ||
-        rubyList != oldDelegate.rubyList;
+        rubyList != oldDelegate.rubyList ||
+        kentenList != oldDelegate.kentenList;
   }
 }

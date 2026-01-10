@@ -120,6 +120,63 @@ class HomePage extends StatelessWidget {
               ),
               maxWidth: 300,
             ),
+            const SizedBox(height: 32),
+            const Text(
+              'With Kenten (Emphasis Marks)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            HorizontalText(
+              text: '重要な部分を強調します。',
+              kentenList: const [
+                Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
+                Kenten(startIndex: 5, length: 2, type: KentenType.filledCircle),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Kenten Types Showcase',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            HorizontalText(
+              text: 'ゴマ 白丸 黒丸 三角 黒三角 二重丸',
+              kentenList: const [
+                Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
+                Kenten(startIndex: 3, length: 2, type: KentenType.circle),
+                Kenten(startIndex: 6, length: 2, type: KentenType.filledCircle),
+                Kenten(startIndex: 9, length: 2, type: KentenType.triangle),
+                Kenten(startIndex: 12, length: 3, type: KentenType.filledTriangle),
+                Kenten(startIndex: 16, length: 3, type: KentenType.doubleCircle),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Combined: Ruby + Kenten',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            HorizontalText(
+              text: '重要な日本語を学びます。',
+              rubyList: const [
+                RubyText(startIndex: 0, length: 2, ruby: 'じゅうよう'),
+                RubyText(startIndex: 3, length: 3, ruby: 'にほんご'),
+                RubyText(startIndex: 7, length: 2, ruby: 'まな'),
+              ],
+              kentenList: const [
+                Kenten(startIndex: 0, length: 2, type: KentenType.filledCircle),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 26),
+                rubyStyle: TextStyle(fontSize: 12, color: Colors.green),
+              ),
+            ),
           ],
         ),
       ),

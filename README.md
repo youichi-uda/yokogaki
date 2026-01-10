@@ -15,8 +15,17 @@ Flutter package for Japanese horizontal text (yokogaki - 横書き) layout with 
   - Gyoto indent for opening brackets
   - Consecutive yakumono spacing
 
-- **Ruby Text (ルビ/振り仮名)**: Furigana support (planned)
-- **Kenten (圏点)**: Emphasis marks (planned)
+- **Ruby Text (ルビ/振り仮名)**: Furigana support
+  - Place ruby text above base characters
+  - Multi-line ruby support (splits across line breaks)
+  - Customizable ruby style
+
+- **Kenten (圏点)**: Emphasis marks
+  - 6 types of emphasis marks (sesame, circles, triangles)
+  - Place marks above characters for emphasis
+  - Customizable kenten style
+  - Combine with ruby text
+
 - **Warichu (割注)**: Inline annotations (planned)
 - **Rich Text**: Multiple styles in one text block (planned)
 
@@ -81,6 +90,91 @@ HorizontalText(
 )
 ```
 
+### With Ruby Text (Furigana)
+
+```dart
+HorizontalText(
+  text: '日本語',
+  rubyList: const [
+    RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 32),
+    rubyStyle: TextStyle(fontSize: 14, color: Colors.red),
+  ),
+)
+```
+
+### Ruby with Line Breaking
+
+```dart
+HorizontalText(
+  text: '漢字はとても難しいです。',
+  rubyList: const [
+    RubyText(startIndex: 0, length: 2, ruby: 'かんじ'),
+    RubyText(startIndex: 5, length: 2, ruby: 'むずか'),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 24),
+    rubyStyle: TextStyle(fontSize: 12, color: Colors.blue),
+  ),
+  maxWidth: 300,
+)
+```
+
+### With Kenten (Emphasis Marks)
+
+```dart
+HorizontalText(
+  text: '重要な部分を強調します。',
+  kentenList: const [
+    Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
+    Kenten(startIndex: 5, length: 2, type: KentenType.filledCircle),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 28),
+  ),
+)
+```
+
+### Kenten Types
+
+```dart
+HorizontalText(
+  text: 'ゴマ 白丸 黒丸 三角 黒三角 二重丸',
+  kentenList: const [
+    Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
+    Kenten(startIndex: 3, length: 2, type: KentenType.circle),
+    Kenten(startIndex: 6, length: 2, type: KentenType.filledCircle),
+    Kenten(startIndex: 9, length: 2, type: KentenType.triangle),
+    Kenten(startIndex: 12, length: 3, type: KentenType.filledTriangle),
+    Kenten(startIndex: 16, length: 3, type: KentenType.doubleCircle),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 28),
+  ),
+)
+```
+
+### Combined Ruby and Kenten
+
+```dart
+HorizontalText(
+  text: '重要な日本語を学びます。',
+  rubyList: const [
+    RubyText(startIndex: 0, length: 2, ruby: 'じゅうよう'),
+    RubyText(startIndex: 3, length: 3, ruby: 'にほんご'),
+  ],
+  kentenList: const [
+    Kenten(startIndex: 0, length: 2, type: KentenType.filledCircle),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 26),
+    rubyStyle: TextStyle(fontSize: 12, color: Colors.green),
+  ),
+)
+```
+
 ### Debug Grid
 
 ```dart
@@ -103,8 +197,8 @@ See the [example](example/) directory for a complete demo app showcasing all fea
 - [x] Kinsoku processing
 - [x] Yakumono adjustment
 - [x] Line breaking with kinsoku rules
-- [ ] Ruby text (furigana) support
-- [ ] Kenten (emphasis marks)
+- [x] Ruby text (furigana) support
+- [x] Kenten (emphasis marks)
 - [ ] Warichu (inline annotations)
 - [ ] Rich text with multiple styles
 - [ ] Text selection support

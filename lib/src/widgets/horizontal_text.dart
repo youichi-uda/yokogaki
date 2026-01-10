@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
+import '../models/kenten.dart';
 import '../rendering/horizontal_text_painter.dart';
 import '../rendering/horizontal_text_layouter.dart';
 
@@ -28,6 +29,9 @@ class HorizontalText extends StatelessWidget {
   /// Ruby text annotations
   final List<RubyText> rubyList;
 
+  /// Kenten (emphasis marks) annotations
+  final List<Kenten> kentenList;
+
   const HorizontalText({
     super.key,
     required this.text,
@@ -35,6 +39,7 @@ class HorizontalText extends StatelessWidget {
     this.maxWidth = 0,
     this.showGrid = false,
     this.rubyList = const [],
+    this.kentenList = const [],
   });
 
   @override
@@ -54,6 +59,7 @@ class HorizontalText extends StatelessWidget {
         maxWidth: maxWidth,
         showGrid: showGrid,
         rubyList: rubyList,
+        kentenList: kentenList,
       ),
     );
   }
