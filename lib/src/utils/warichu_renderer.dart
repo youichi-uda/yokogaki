@@ -56,12 +56,9 @@ class WarichuRenderer {
 
       if (firstCharLayout == null) continue;
 
-      // Split warichu text into two lines
-      // For simplicity, we split at the middle character
-      final warichuText = warichu.warichu;
-      final midPoint = (warichuText.length / 2).ceil();
-      final topLine = warichuText.substring(0, midPoint);
-      final bottomLine = warichuText.substring(midPoint);
+      // Use Warichu's built-in line splitting
+      final topLine = warichu.firstLine;
+      final bottomLine = warichu.secondLine;
 
       // Position warichu text vertically centered within the line height
       // For horizontal text:

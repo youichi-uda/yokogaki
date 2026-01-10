@@ -42,7 +42,8 @@ class LayoutCacheKey {
         a.enableKinsoku == b.enableKinsoku &&
         a.enableHalfWidthYakumono == b.enableHalfWidthYakumono &&
         a.enableGyotoIndent == b.enableGyotoIndent &&
-        a.enableKerning == b.enableKerning;
+        a.enableKerning == b.enableKerning &&
+        a.alignment == b.alignment;
   }
 
   /// Calculate hash code for HorizontalTextStyle
@@ -58,6 +59,7 @@ class LayoutCacheKey {
       style.enableHalfWidthYakumono,
       style.enableGyotoIndent,
       style.enableKerning,
+      style.alignment,
     );
   }
 }

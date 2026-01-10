@@ -106,12 +106,13 @@ class TextSpanData {
       kentenList: kentenList.map((kenten) => Kenten(
         startIndex: kenten.startIndex + offset,
         length: kenten.length,
-        type: kenten.type,
+        style: kenten.style,
       )).toList(),
       warichuList: warichuList.map((warichu) => Warichu(
         startIndex: warichu.startIndex + offset,
         length: warichu.length,
-        warichu: warichu.warichu,
+        text: warichu.text,
+        splitIndex: warichu.splitIndex,
       )).toList(),
     );
   }

@@ -1,29 +1,54 @@
-/// Warichu (inline annotation) for horizontal text
+/// Warichu (inline annotations) for horizontal text
 ///
-/// Warichu is a two-line annotation displayed inline with the main text,
-/// typically used for brief explanatory notes or alternative readings
+/// Warichu are inline annotations displayed in two smaller lines
+/// within the main horizontal text flow
 class Warichu {
-  /// Starting index of the base text in the full string
+  /// Starting index in the main text where warichu begins
   final int startIndex;
 
-  /// Length of the base text
+  /// Length of the warichu text
   final int length;
 
-  /// Warichu text to display (will be split into two lines)
-  final String warichu;
+  /// Text content of the warichu
+  final String text;
+
+  /// Position to split the warichu into two lines (index within warichu text)
+  /// If null, splits at the middle
+  final int? splitIndex;
 
   const Warichu({
     required this.startIndex,
     required this.length,
-    required this.warichu,
+    required this.text,
+    this.splitIndex,
   });
 
-  /// End index of the base text (exclusive)
+  /// End index of the warichu text (exclusive)
   int get endIndex => startIndex + length;
+
+  /// Get the first line of warichu
+  String get firstLine {
+    if (splitIndex == null) {
+      // Split at middle
+      final mid = (text.length / 2).ceil();
+      return text.substring(0, mid);
+    }
+    return text.substring(0, splitIndex);
+  }
+
+  /// Get the second line of warichu
+  String get secondLine {
+    if (splitIndex == null) {
+      // Split at middle
+      final mid = (text.length / 2).ceil();
+      return text.substring(mid);
+    }
+    return text.substring(splitIndex!);
+  }
 
   @override
   String toString() {
-    return 'Warichu(startIndex: $startIndex, length: $length, warichu: $warichu)';
+    return 'Warichu(startIndex: $startIndex, length: $length, text: "$text", splitIndex: $splitIndex)';
   }
 
   @override
@@ -32,9 +57,10 @@ class Warichu {
     return other is Warichu &&
         other.startIndex == startIndex &&
         other.length == length &&
-        other.warichu == warichu;
+        other.text == text &&
+        other.splitIndex == splitIndex;
   }
 
   @override
-  int get hashCode => Object.hash(startIndex, length, warichu);
+  int get hashCode => Object.hash(startIndex, length, text, splitIndex);
 }

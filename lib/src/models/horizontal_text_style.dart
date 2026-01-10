@@ -1,4 +1,5 @@
 import 'package:flutter/painting.dart';
+import 'package:kinsoku/kinsoku.dart';
 
 /// Style configuration for horizontal text layout
 class HorizontalTextStyle {
@@ -38,6 +39,20 @@ class HorizontalTextStyle {
   /// Enable kerning (advanced character spacing)
   final bool enableKerning;
 
+  /// Line alignment
+  /// - [TextAlignment.start]: Left alignment (天付き)
+  /// - [TextAlignment.center]: Center alignment
+  /// - [TextAlignment.end]: Right alignment (地付き)
+  final TextAlignment alignment;
+
+  /// Text indent in character units (字下げ)
+  ///
+  /// For horizontal text, this shifts the starting position right by
+  /// `indent * fontSize` pixels.
+  ///
+  /// Example: `indent: 2` shifts text right by 2 character widths.
+  final int indent;
+
   const HorizontalTextStyle({
     this.baseStyle = const TextStyle(),
     this.lineSpacing = 0.0,
@@ -50,6 +65,8 @@ class HorizontalTextStyle {
     this.enableHalfWidthYakumono = true,
     this.enableGyotoIndent = true,
     this.enableKerning = true,
+    this.alignment = TextAlignment.center,
+    this.indent = 0,
   });
 
   /// Create a copy with modified properties
@@ -65,6 +82,8 @@ class HorizontalTextStyle {
     bool? enableHalfWidthYakumono,
     bool? enableGyotoIndent,
     bool? enableKerning,
+    TextAlignment? alignment,
+    int? indent,
   }) {
     return HorizontalTextStyle(
       baseStyle: baseStyle ?? this.baseStyle,
@@ -78,6 +97,8 @@ class HorizontalTextStyle {
       enableHalfWidthYakumono: enableHalfWidthYakumono ?? this.enableHalfWidthYakumono,
       enableGyotoIndent: enableGyotoIndent ?? this.enableGyotoIndent,
       enableKerning: enableKerning ?? this.enableKerning,
+      alignment: alignment ?? this.alignment,
+      indent: indent ?? this.indent,
     );
   }
 }

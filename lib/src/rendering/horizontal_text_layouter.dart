@@ -62,7 +62,9 @@ class HorizontalTextLayouter {
     final layouts = <CharacterLayout>[];
     final fontSize = style.baseStyle.fontSize ?? 16.0;
 
-    double currentX = 0.0; // Horizontal position (increases to the right)
+    // Apply indent (字下げ) - shift starting X position
+    final indentOffset = style.indent * fontSize;
+    double currentX = indentOffset; // Horizontal position (increases to the right)
     double currentY = 0.0; // Vertical position (increases downward for new lines)
     int lineStartIndex = 0;
     bool shouldBreakAfterCurrentChar = false; // Flag for burasage (hanging)
@@ -88,7 +90,7 @@ class HorizontalTextLayouter {
               layouts.removeWhere((layout) => layout.textIndex >= actualBreakPos);
 
               // Reset current position to beginning of new line
-              currentX = 0.0;
+              currentX = indentOffset;
               currentY += fontSize + style.lineSpacing;
               lineStartIndex = actualBreakPos;
 
@@ -107,14 +109,14 @@ class HorizontalTextLayouter {
               }
             } else {
               // Break at current position
-              currentX = 0.0;
+              currentX = indentOffset;
               currentY += fontSize + style.lineSpacing;
               lineStartIndex = i;
             }
           }
         } else {
           // Simple line breaking without kinsoku
-          currentX = 0.0;
+          currentX = indentOffset;
           currentY += fontSize + style.lineSpacing;
           lineStartIndex = i;
         }
@@ -139,10 +141,68 @@ class HorizontalTextLayouter {
 
       // Check if we should break after this character (burasage case)
       if (shouldBreakAfterCurrentChar) {
-        currentX = 0.0;
+        currentX = indentOffset;
         currentY += fontSize + style.lineSpacing;
         lineStartIndex = i + 1;
         shouldBreakAfterCurrentChar = false;
+      }
+    }
+
+    // Apply line alignment (jizuki, tenzuki, center)
+    if (maxWidth > 0 && layouts.isNotEmpty) {
+      // Group layouts by line (Y coordinate)
+      final lineGroups = <double, List<int>>{};
+      for (int i = 0; i < layouts.length; i++) {
+        final y = layouts[i].position.dy;
+        lineGroups.putIfAbsent(y, () => []).add(i);
+      }
+
+      // Adjust X position for each line based on alignment
+      for (final indices in lineGroups.values) {
+        if (indices.isEmpty) continue;
+
+        // Find the maximum X coordinate in this line
+        double maxX = 0.0;
+        for (final idx in indices) {
+          final layout = layouts[idx];
+          // Calculate character width
+          double charWidth = YakumonoAdjuster.isHalfWidthYakumono(layout.character) &&
+                             style.enableHalfWidthYakumono
+              ? fontSize * 0.5
+              : fontSize;
+          double xEnd = layout.position.dx + charWidth;
+          if (xEnd > maxX) {
+            maxX = xEnd;
+          }
+        }
+
+        // Calculate X offset based on alignment
+        double xOffset = 0.0;
+        switch (style.alignment) {
+          case TextAlignment.start:
+            // Left alignment (天付き) - no offset
+            xOffset = 0.0;
+            break;
+          case TextAlignment.center:
+            // Center alignment - offset to center
+            xOffset = (maxWidth - maxX) / 2;
+            break;
+          case TextAlignment.end:
+            // Right alignment (地付き) - offset to right
+            xOffset = maxWidth - maxX;
+            break;
+        }
+
+        // Apply offset to all characters in this line
+        for (final idx in indices) {
+          final layout = layouts[idx];
+          layouts[idx] = CharacterLayout(
+            character: layout.character,
+            position: Offset(layout.position.dx + xOffset, layout.position.dy),
+            ruby: layout.ruby,
+            textIndex: layout.textIndex,
+          );
+        }
       }
     }
 

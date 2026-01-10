@@ -1,3 +1,45 @@
+/// Styles for kenten (emphasis dots)
+enum KentenStyle {
+  /// Sesame dots (ゴマ点)
+  sesame,
+
+  /// Filled circle (黒丸)
+  filledCircle,
+
+  /// Hollow circle (白丸)
+  circle,
+
+  /// Double circle (二重丸)
+  doubleCircle,
+
+  /// Filled triangle (黒三角)
+  filledTriangle,
+
+  /// Hollow triangle (白三角)
+  triangle,
+
+  /// X mark (×印)
+  x,
+
+  /// Filled diamond (黒菱形)
+  filledDiamond,
+
+  /// Hollow diamond (白菱形)
+  diamond,
+
+  /// Filled square (黒四角)
+  filledSquare,
+
+  /// Hollow square (白四角)
+  square,
+
+  /// Filled star (黒星)
+  filledStar,
+
+  /// Hollow star (白星)
+  star,
+}
+
 /// Kenten (emphasis marks) annotation for horizontal text
 ///
 /// Kenten are emphasis dots or marks displayed above characters
@@ -8,13 +50,13 @@ class Kenten {
   /// Length of the base text
   final int length;
 
-  /// Type of kenten mark to display
-  final KentenType type;
+  /// Style of kenten to use
+  final KentenStyle style;
 
   const Kenten({
     required this.startIndex,
     required this.length,
-    this.type = KentenType.sesame,
+    this.style = KentenStyle.sesame,
   });
 
   /// End index of the base text (exclusive)
@@ -22,7 +64,7 @@ class Kenten {
 
   @override
   String toString() {
-    return 'Kenten(startIndex: $startIndex, length: $length, type: $type)';
+    return 'Kenten(startIndex: $startIndex, length: $length, style: $style)';
   }
 
   @override
@@ -31,30 +73,9 @@ class Kenten {
     return other is Kenten &&
         other.startIndex == startIndex &&
         other.length == length &&
-        other.type == type;
+        other.style == style;
   }
 
   @override
-  int get hashCode => Object.hash(startIndex, length, type);
-}
-
-/// Types of kenten marks
-enum KentenType {
-  /// Sesame dot (胡麻点 gomaten) - most common
-  sesame,
-
-  /// Circle (白丸 shiromaru)
-  circle,
-
-  /// Filled circle (黒丸 kuromaru)
-  filledCircle,
-
-  /// Triangle (三角 sankaku)
-  triangle,
-
-  /// Filled triangle (黒三角 kurosankaku)
-  filledTriangle,
-
-  /// Double circle (二重丸 nijumaru)
-  doubleCircle,
+  int get hashCode => Object.hash(startIndex, length, style);
 }
