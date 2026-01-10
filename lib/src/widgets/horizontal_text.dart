@@ -49,10 +49,20 @@ class HorizontalText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get default text color from theme if not specified
+    final defaultColor = style.baseStyle.color ??
+        Theme.of(context).textTheme.bodyMedium?.color ??
+        const Color(0xFF000000);
+
+    // Merge default color with user style
+    final effectiveStyle = style.copyWith(
+      baseStyle: style.baseStyle.copyWith(color: defaultColor),
+    );
+
     // Calculate the size needed for the text
     final size = HorizontalTextLayouter.calculateSize(
       text: text,
-      style: style,
+      style: effectiveStyle,
       maxWidth: maxWidth,
     );
 
@@ -60,7 +70,7 @@ class HorizontalText extends StatelessWidget {
       size: size,
       painter: HorizontalTextPainter(
         text: text,
-        style: style,
+        style: effectiveStyle,
         maxWidth: maxWidth,
         showGrid: showGrid,
         rubyList: rubyList,

@@ -35,6 +35,11 @@ class HorizontalRichText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get default text color from theme
+    final defaultColor = style.baseStyle.color ??
+        Theme.of(context).textTheme.bodyMedium?.color ??
+        const Color(0xFF000000);
+
     // Flatten the span hierarchy
     final spanDataList = span.toTextSpanData();
 
@@ -51,10 +56,15 @@ class HorizontalRichText extends StatelessWidget {
 
       // Add style range if custom style is specified
       if (spanData.style != null) {
+        // Apply default color if not specified in span style
+        final effectiveSpanStyle = spanData.style!.color == null
+            ? spanData.style!.copyWith(color: defaultColor)
+            : spanData.style!;
+
         styleRanges.add(StyleRange(
           startIndex: currentOffset,
           endIndex: currentOffset + spanData.text.length,
-          style: spanData.style!,
+          style: effectiveSpanStyle,
         ));
       }
 
@@ -67,10 +77,15 @@ class HorizontalRichText extends StatelessWidget {
       currentOffset += spanData.text.length;
     }
 
+    // Merge default color with base style
+    final effectiveStyle = style.copyWith(
+      baseStyle: style.baseStyle.copyWith(color: defaultColor),
+    );
+
     // Calculate the size needed for the text
     final size = HorizontalTextLayouter.calculateSize(
       text: combinedText.toString(),
-      style: style,
+      style: effectiveStyle,
       maxWidth: maxWidth,
     );
 
@@ -78,7 +93,7 @@ class HorizontalRichText extends StatelessWidget {
       size: size,
       painter: HorizontalRichTextPainter(
         text: combinedText.toString(),
-        style: style,
+        style: effectiveStyle,
         maxWidth: maxWidth,
         showGrid: showGrid,
         rubyList: allRuby,

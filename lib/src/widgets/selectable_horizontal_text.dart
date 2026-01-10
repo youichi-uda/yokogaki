@@ -61,10 +61,20 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
 
   @override
   Widget build(BuildContext context) {
+    // Get default text color from theme if not specified
+    final defaultColor = widget.style.baseStyle.color ??
+        Theme.of(context).textTheme.bodyMedium?.color ??
+        const Color(0xFF000000);
+
+    // Merge default color with user style
+    final effectiveStyle = widget.style.copyWith(
+      baseStyle: widget.style.baseStyle.copyWith(color: defaultColor),
+    );
+
     // Calculate the size needed for the text
     final size = HorizontalTextLayouter.calculateSize(
       text: widget.text,
-      style: widget.style,
+      style: effectiveStyle,
       maxWidth: widget.maxWidth,
     );
 
@@ -85,7 +95,7 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
         size: size,
         painter: SelectableHorizontalTextPainter(
           text: widget.text,
-          style: widget.style,
+          style: effectiveStyle,
           maxWidth: widget.maxWidth,
           showGrid: widget.showGrid,
           rubyList: widget.rubyList,
