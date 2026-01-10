@@ -148,8 +148,8 @@ class RubyRenderer {
         // If kenten marks exist, place ruby above them
         double rubyY;
         if (hasKentenInLine) {
-          // Ruby should be above kenten: lineY - kentenSize - 4 - rubyFontSize - 2
-          rubyY = lineY - kentenSize - 4.0 - rubyFontSize - 2.0;
+          // Ruby should be above kenten: lineY - kentenSize - 1 (kenten gap) - rubyFontSize - 2 (ruby gap)
+          rubyY = lineY - kentenSize - 1.0 - rubyFontSize - 2.0;
         } else {
           // Ruby directly above text
           rubyY = lineY - rubyFontSize - 2.0; // 2px gap
