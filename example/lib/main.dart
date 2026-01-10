@@ -111,8 +111,8 @@ class HomePage extends StatelessWidget {
             HorizontalText(
               text: '漢字はとても難しいです。',
               rubyList: const [
-                RubyText(startIndex: 0, length: 2, ruby: 'かんじ'),
-                RubyText(startIndex: 5, length: 2, ruby: 'むずか'),
+                RubyText(startIndex: 0, length: 2, ruby: 'かんじ'), // 漢字
+                RubyText(startIndex: 6, length: 1, ruby: 'むずか'), // 難
               ],
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 24),
