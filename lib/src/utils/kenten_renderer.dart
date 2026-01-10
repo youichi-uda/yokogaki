@@ -67,11 +67,15 @@ class KentenRenderer {
           // Get actual character width
           final charWidth = _getCharacterWidth(charLayout.character, style);
 
+          // For ASCII characters, use a bit more gap
+          final isAscii = charLayout.character.codeUnitAt(0) < 128;
+          final kentenGap = isAscii ? 2.0 : 8.0;
+
           // Position kenten mark above the character
           // For horizontal text: above = Y - kentenSize - gap
           final kentenPosition = Offset(
             charLayout.position.dx + (charWidth - kentenSize) / 2, // Center horizontally based on actual width
-            charLayout.position.dy - kentenSize + 8, // Above character with +8px gap (very close overlap)
+            charLayout.position.dy - kentenSize + kentenGap,
           );
 
           kentenLayouts.add(KentenLayout(
