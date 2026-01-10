@@ -147,7 +147,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       ..strokeWidth = 1.0;
 
     // Draw vertical lines (columns)
-    for (double x = 0; x < size.width; x += fontSize) {
+    for (double x = 0; x <= size.width; x += fontSize) {
       canvas.drawLine(
         Offset(x, 0),
         Offset(x, size.height),
@@ -156,7 +156,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
     }
 
     // Draw horizontal lines (rows)
-    for (double y = 0; y < size.height; y += fontSize) {
+    for (double y = 0; y <= size.height; y += fontSize) {
       canvas.drawLine(
         Offset(0, y),
         Offset(size.width, y),
