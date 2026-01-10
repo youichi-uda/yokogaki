@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
+import '../models/kenten.dart';
 import '../rendering/horizontal_text_layouter.dart';
 
 /// Layout information for ruby text
@@ -23,23 +24,40 @@ class RubyLayout {
 
 /// Ruby text renderer for horizontal text
 class RubyRenderer {
+  /// Check if a character index has kenten marks
+  static bool _hasKenten(int charIndex, List<dynamic>? kentenList) {
+    if (kentenList == null || kentenList.isEmpty) return false;
+
+    for (final kenten in kentenList) {
+      if (kenten is Kenten) {
+        if (charIndex >= kenten.startIndex && charIndex < kenten.endIndex) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   /// Layout ruby text for given base text
   ///
   /// [baseText] The base text
   /// [rubyList] List of ruby annotations
   /// [style] Text style configuration
   /// [characterLayouts] Character layouts from HorizontalTextLayouter
+  /// [kentenList] Optional list of kenten marks to avoid overlap
   ///
   /// Returns list of ruby layouts
   static List<RubyLayout> layoutRuby(
     String baseText,
     List<RubyText> rubyList,
     HorizontalTextStyle style,
-    List<CharacterLayout> characterLayouts,
-  ) {
+    List<CharacterLayout> characterLayouts, {
+    List<dynamic>? kentenList,
+  }) {
     final layouts = <RubyLayout>[];
     final baseFontSize = style.baseStyle.fontSize ?? 16.0;
     final rubyFontSize = style.rubyStyle?.fontSize ?? (baseFontSize * 0.5);
+    final kentenSize = baseFontSize * 0.3; // Same as in KentenRenderer
 
     for (final ruby in rubyList) {
       // Find all character layouts in this ruby range
@@ -116,8 +134,26 @@ class RubyRenderer {
         // Center ruby horizontally with the base text
         final rubyX = baseX + (baseTextWidth - rubyTextWidth) / 2;
 
+        // Check if any character in this line has kenten marks
+        bool hasKentenInLine = false;
+        for (final charLayout in lineChars) {
+          final charIndex = charLayout.textIndex;
+          if (_hasKenten(charIndex, kentenList)) {
+            hasKentenInLine = true;
+            break;
+          }
+        }
+
         // Place ruby above the base text
-        final rubyY = lineY - rubyFontSize - 2.0; // 2px gap
+        // If kenten marks exist, place ruby above them
+        double rubyY;
+        if (hasKentenInLine) {
+          // Ruby should be above kenten: lineY - kentenSize - 4 - rubyFontSize - 2
+          rubyY = lineY - kentenSize - 4.0 - rubyFontSize - 2.0;
+        } else {
+          // Ruby directly above text
+          rubyY = lineY - rubyFontSize - 2.0; // 2px gap
+        }
 
         layouts.add(RubyLayout(
           position: Offset(rubyX, rubyY),

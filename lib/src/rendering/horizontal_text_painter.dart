@@ -48,7 +48,13 @@ class HorizontalTextPainter extends CustomPainter {
 
     // Layout ruby text if any
     final rubyLayouts = rubyList.isNotEmpty
-        ? RubyRenderer.layoutRuby(text, rubyList, style, layouts)
+        ? RubyRenderer.layoutRuby(
+            text,
+            rubyList,
+            style,
+            layouts,
+            kentenList: kentenList,
+          )
         : <RubyLayout>[];
 
     // Layout kenten marks if any
