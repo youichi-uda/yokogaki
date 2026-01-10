@@ -386,9 +386,9 @@ class HomePage extends StatelessWidget {
             HorizontalText(
               text: '吾輩は猫である。名前はまだ無い。どこで生まれたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。',
               kentenList: const [
-                Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
-                Kenten(startIndex: 8, length: 4, type: KentenType.filledCircle),
-                Kenten(startIndex: 20, length: 3, type: KentenType.sesame),
+                Kenten(startIndex: 0, length: 2, type: KentenType.sesame), // 吾輩
+                Kenten(startIndex: 8, length: 2, type: KentenType.filledCircle), // 名前
+                Kenten(startIndex: 19, length: 4, type: KentenType.sesame), // 生まれた
               ],
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 24),
@@ -405,12 +405,12 @@ class HomePage extends StatelessWidget {
             HorizontalText(
               text: '吾輩は猫である。名前はまだ無い。どこで生まれたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。',
               rubyList: const [
-                RubyText(startIndex: 0, length: 2, ruby: 'わがはい'),
-                RubyText(startIndex: 3, length: 1, ruby: 'ねこ'),
-                RubyText(startIndex: 8, length: 2, ruby: 'なまえ'),
-                RubyText(startIndex: 21, length: 2, ruby: 'けんとう'),
-                RubyText(startIndex: 30, length: 2, ruby: 'うすぐら'),
-                RubyText(startIndex: 47, length: 2, ruby: 'きおく'),
+                RubyText(startIndex: 0, length: 2, ruby: 'わがはい'), // 吾輩
+                RubyText(startIndex: 3, length: 1, ruby: 'ねこ'), // 猫
+                RubyText(startIndex: 8, length: 2, ruby: 'なまえ'), // 名前
+                RubyText(startIndex: 27, length: 2, ruby: 'けんとう'), // 見当
+                RubyText(startIndex: 37, length: 2, ruby: 'うすぐら'), // 薄暗
+                RubyText(startIndex: 63, length: 2, ruby: 'きおく'), // 記憶
               ],
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 24),
@@ -428,17 +428,17 @@ class HomePage extends StatelessWidget {
             HorizontalText(
               text: '吾輩は猫である。名前はまだ無い。どこで生まれたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。',
               rubyList: const [
-                RubyText(startIndex: 0, length: 2, ruby: 'わがはい'),
-                RubyText(startIndex: 3, length: 1, ruby: 'ねこ'),
-                RubyText(startIndex: 8, length: 2, ruby: 'なまえ'),
-                RubyText(startIndex: 21, length: 2, ruby: 'けんとう'),
-                RubyText(startIndex: 30, length: 2, ruby: 'うすぐら'),
-                RubyText(startIndex: 47, length: 2, ruby: 'きおく'),
+                RubyText(startIndex: 0, length: 2, ruby: 'わがはい'), // 吾輩
+                RubyText(startIndex: 3, length: 1, ruby: 'ねこ'), // 猫
+                RubyText(startIndex: 8, length: 2, ruby: 'なまえ'), // 名前
+                RubyText(startIndex: 27, length: 2, ruby: 'けんとう'), // 見当
+                RubyText(startIndex: 37, length: 2, ruby: 'うすぐら'), // 薄暗
+                RubyText(startIndex: 63, length: 2, ruby: 'きおく'), // 記憶
               ],
               kentenList: const [
-                Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
-                Kenten(startIndex: 8, length: 2, type: KentenType.filledCircle),
-                Kenten(startIndex: 21, length: 2, type: KentenType.sesame),
+                Kenten(startIndex: 0, length: 2, type: KentenType.sesame), // 吾輩
+                Kenten(startIndex: 8, length: 2, type: KentenType.filledCircle), // 名前
+                Kenten(startIndex: 27, length: 2, type: KentenType.sesame), // 見当
               ],
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 24),
