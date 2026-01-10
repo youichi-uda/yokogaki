@@ -46,6 +46,14 @@ class SelectableHorizontalText extends StatefulWidget {
   /// The returned items will be added after Copy and Select All
   final List<PopupMenuEntry<void>> Function(BuildContext context, String selectedText)? additionalMenuItems;
 
+  /// Label for the Copy menu item
+  /// If null, automatically uses '複製' for Japanese locale and 'Copy' for others
+  final String? copyLabel;
+
+  /// Label for the Select All menu item
+  /// If null, automatically uses 'すべて選択' for Japanese locale and 'Select All' for others
+  final String? selectAllLabel;
+
   const SelectableHorizontalText({
     super.key,
     required this.text,
@@ -57,6 +65,8 @@ class SelectableHorizontalText extends StatefulWidget {
     this.warichuList = const [],
     this.selectionColor,
     this.additionalMenuItems,
+    this.copyLabel,
+    this.selectAllLabel,
   });
 
   @override
@@ -461,13 +471,20 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
 
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 
+    // Determine labels based on locale
+    final locale = Localizations.localeOf(context);
+    final isJapanese = locale.languageCode == 'ja';
+
+    final copyText = widget.copyLabel ?? (isJapanese ? '複製' : 'Copy');
+    final selectAllText = widget.selectAllLabel ?? (isJapanese ? 'すべて選択' : 'Select All');
+
     final menuItems = <PopupMenuEntry<void>>[
       PopupMenuItem(
         child: Row(
           children: [
             const Icon(Icons.copy, size: 20),
             const SizedBox(width: 12),
-            const Text('Copy'),
+            Text(copyText),
             const Spacer(),
             Text(
               'Ctrl+C',
@@ -484,7 +501,7 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
           children: [
             const Icon(Icons.select_all, size: 20),
             const SizedBox(width: 12),
-            const Text('Select All'),
+            Text(selectAllText),
             const Spacer(),
             Text(
               'Ctrl+A',
