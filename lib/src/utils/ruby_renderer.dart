@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kinsoku/kinsoku.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
@@ -116,7 +117,13 @@ class RubyRenderer {
         final firstChar = lineChars.first;
         final lastChar = lineChars.last;
         final baseX = firstChar.position.dx;
-        final baseTextWidth = (lastChar.position.dx - firstChar.position.dx) + baseFontSize;
+
+        // Calculate last character width (considering half-width yakumono)
+        final lastCharWidth = YakumonoAdjuster.isHalfWidthYakumono(lastChar.character)
+            ? baseFontSize * 0.5
+            : baseFontSize;
+
+        final baseTextWidth = (lastChar.position.dx - firstChar.position.dx) + lastCharWidth;
 
         // Calculate ruby text width
         final textPainter = TextPainter(

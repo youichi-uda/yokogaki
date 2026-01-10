@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/painting.dart';
+import 'package:kinsoku/kinsoku.dart';
 import '../models/kenten.dart';
 import '../models/horizontal_text_style.dart';
 import '../rendering/horizontal_text_layouter.dart';
@@ -40,10 +41,15 @@ class KentenRenderer {
       for (final charLayout in layouts) {
         final charIndex = charLayout.textIndex;
         if (charIndex >= kenten.startIndex && charIndex < kenten.endIndex) {
+          // Calculate actual character width (considering half-width yakumono)
+          final charWidth = YakumonoAdjuster.isHalfWidthYakumono(charLayout.character)
+              ? fontSize * 0.5
+              : fontSize;
+
           // Position kenten mark above the character
           // For horizontal text: above = Y - kentenSize - gap
           final kentenPosition = Offset(
-            charLayout.position.dx + (fontSize - kentenSize) / 2, // Center horizontally
+            charLayout.position.dx + (charWidth - kentenSize) / 2, // Center horizontally based on actual width
             charLayout.position.dy - kentenSize + 8, // Above character with +8px gap (very close overlap)
           );
 
