@@ -100,22 +100,24 @@ class HorizontalRichTextPainter extends CustomPainter {
     return style.baseStyle;
   }
 
+  // Reusable TextPainter instance to avoid repeated allocations
+  static final TextPainter _textPainter = TextPainter(
+    textDirection: TextDirection.ltr,
+  );
+
   void _drawCharacter(
     Canvas canvas,
     CharacterLayout layout,
     double fontSize,
     TextStyle charStyle,
   ) {
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: layout.character,
-        style: charStyle,
-      ),
-      textDirection: TextDirection.ltr,
+    _textPainter.text = TextSpan(
+      text: layout.character,
+      style: charStyle,
     );
 
-    textPainter.layout();
-    textPainter.paint(canvas, layout.position);
+    _textPainter.layout();
+    _textPainter.paint(canvas, layout.position);
   }
 
   void _drawGrid(Canvas canvas, Size size, double fontSize) {

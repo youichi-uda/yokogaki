@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kinsoku/kinsoku.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
+import '../utils/layout_cache.dart';
 
 /// Layout information for a single character
 class CharacterLayout {
@@ -32,15 +33,30 @@ class HorizontalTextLayouter {
   /// [text] The text to layout
   /// [style] Style configuration
   /// [maxWidth] Maximum width for line breaking (0 = no limit)
+  /// [useCache] Whether to use layout cache (default: true)
   ///
   /// Returns list of character layouts
   static List<CharacterLayout> layout({
     required String text,
     required HorizontalTextStyle style,
     double maxWidth = 0,
+    bool useCache = true,
   }) {
     if (text.isEmpty) {
       return [];
+    }
+
+    // Check cache first
+    if (useCache) {
+      final cacheKey = LayoutCacheKey(
+        text: text,
+        style: style,
+        maxWidth: maxWidth,
+      );
+      final cached = LayoutCache.get(cacheKey);
+      if (cached != null) {
+        return cached.layouts;
+      }
     }
 
     final layouts = <CharacterLayout>[];
@@ -103,6 +119,20 @@ class HorizontalTextLayouter {
       currentX += charWidth + style.characterSpacing;
     }
 
+    // Store in cache if enabled
+    if (useCache) {
+      final cacheKey = LayoutCacheKey(
+        text: text,
+        style: style,
+        maxWidth: maxWidth,
+      );
+      final size = _calculateSizeFromLayouts(layouts, style);
+      LayoutCache.put(
+        cacheKey,
+        LayoutCacheValue(layouts: layouts, size: size),
+      );
+    }
+
     return layouts;
   }
 
@@ -111,12 +141,35 @@ class HorizontalTextLayouter {
     required String text,
     required HorizontalTextStyle style,
     double maxWidth = 0,
+    bool useCache = true,
   }) {
     if (text.isEmpty) {
       return Size.zero;
     }
 
-    final layouts = layout(text: text, style: style, maxWidth: maxWidth);
+    // Check cache first
+    if (useCache) {
+      final cacheKey = LayoutCacheKey(
+        text: text,
+        style: style,
+        maxWidth: maxWidth,
+      );
+      final cached = LayoutCache.get(cacheKey);
+      if (cached != null) {
+        return cached.size;
+      }
+    }
+
+    // Layout will also store in cache
+    final layouts = layout(text: text, style: style, maxWidth: maxWidth, useCache: useCache);
+    return _calculateSizeFromLayouts(layouts, style);
+  }
+
+  /// Calculate size from existing layouts
+  static Size _calculateSizeFromLayouts(
+    List<CharacterLayout> layouts,
+    HorizontalTextStyle style,
+  ) {
     if (layouts.isEmpty) {
       return Size.zero;
     }

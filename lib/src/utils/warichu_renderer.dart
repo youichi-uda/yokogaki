@@ -85,6 +85,11 @@ class WarichuRenderer {
     return warichuLayouts;
   }
 
+  // Reusable TextPainter instance to avoid repeated allocations
+  static final TextPainter _textPainter = TextPainter(
+    textDirection: TextDirection.ltr,
+  );
+
   /// Render warichu annotations to the canvas
   static void render(
     Canvas canvas,
@@ -95,35 +100,27 @@ class WarichuRenderer {
     final warichuColor = baseColor.withValues(alpha: 0.8); // Slightly lighter
 
     for (final layout in warichuLayouts) {
-      // Draw top line
-      final topLinePainter = TextPainter(
-        text: TextSpan(
-          text: layout.topLine,
-          style: TextStyle(
-            fontSize: layout.fontSize,
-            color: warichuColor,
-            fontFamily: style.baseStyle.fontFamily,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
+      final warichuStyle = TextStyle(
+        fontSize: layout.fontSize,
+        color: warichuColor,
+        fontFamily: style.baseStyle.fontFamily,
       );
-      topLinePainter.layout();
-      topLinePainter.paint(canvas, layout.topLinePosition);
+
+      // Draw top line
+      _textPainter.text = TextSpan(
+        text: layout.topLine,
+        style: warichuStyle,
+      );
+      _textPainter.layout();
+      _textPainter.paint(canvas, layout.topLinePosition);
 
       // Draw bottom line
-      final bottomLinePainter = TextPainter(
-        text: TextSpan(
-          text: layout.bottomLine,
-          style: TextStyle(
-            fontSize: layout.fontSize,
-            color: warichuColor,
-            fontFamily: style.baseStyle.fontFamily,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
+      _textPainter.text = TextSpan(
+        text: layout.bottomLine,
+        style: warichuStyle,
       );
-      bottomLinePainter.layout();
-      bottomLinePainter.paint(canvas, layout.bottomLinePosition);
+      _textPainter.layout();
+      _textPainter.paint(canvas, layout.bottomLinePosition);
     }
   }
 }

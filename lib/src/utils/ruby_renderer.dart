@@ -132,6 +132,11 @@ class RubyRenderer {
     return layouts;
   }
 
+  // Reusable TextPainter instance to avoid repeated allocations
+  static final TextPainter _textPainter = TextPainter(
+    textDirection: TextDirection.ltr,
+  );
+
   /// Render ruby text to canvas
   ///
   /// [canvas] The canvas to draw on
@@ -143,18 +148,15 @@ class RubyRenderer {
     HorizontalTextStyle style,
   ) {
     for (final layout in rubyLayouts) {
-      final textPainter = TextPainter(
-        text: TextSpan(
-          text: layout.ruby,
-          style: (style.rubyStyle ?? style.baseStyle).copyWith(
-            fontSize: layout.fontSize,
-          ),
+      _textPainter.text = TextSpan(
+        text: layout.ruby,
+        style: (style.rubyStyle ?? style.baseStyle).copyWith(
+          fontSize: layout.fontSize,
         ),
-        textDirection: TextDirection.ltr,
       );
 
-      textPainter.layout();
-      textPainter.paint(canvas, layout.position);
+      _textPainter.layout();
+      _textPainter.paint(canvas, layout.position);
     }
   }
 }
