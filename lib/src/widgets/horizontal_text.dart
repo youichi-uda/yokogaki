@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
+import '../models/warichu.dart';
 import '../rendering/horizontal_text_painter.dart';
 import '../rendering/horizontal_text_layouter.dart';
 
@@ -32,6 +33,9 @@ class HorizontalText extends StatelessWidget {
   /// Kenten (emphasis marks) annotations
   final List<Kenten> kentenList;
 
+  /// Warichu (inline annotations) annotations
+  final List<Warichu> warichuList;
+
   const HorizontalText({
     super.key,
     required this.text,
@@ -40,6 +44,7 @@ class HorizontalText extends StatelessWidget {
     this.showGrid = false,
     this.rubyList = const [],
     this.kentenList = const [],
+    this.warichuList = const [],
   });
 
   @override
@@ -60,6 +65,7 @@ class HorizontalText extends StatelessWidget {
         showGrid: showGrid,
         rubyList: rubyList,
         kentenList: kentenList,
+        warichuList: warichuList,
       ),
     );
   }

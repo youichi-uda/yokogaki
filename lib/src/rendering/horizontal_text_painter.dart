@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
+import '../models/warichu.dart';
 import 'horizontal_text_layouter.dart';
 import '../utils/ruby_renderer.dart';
 import '../utils/kenten_renderer.dart';
+import '../utils/warichu_renderer.dart';
 
 /// Custom painter for horizontal Japanese text
 class HorizontalTextPainter extends CustomPainter {
@@ -14,6 +16,7 @@ class HorizontalTextPainter extends CustomPainter {
   final bool showGrid;
   final List<RubyText> rubyList;
   final List<Kenten> kentenList;
+  final List<Warichu> warichuList;
 
   HorizontalTextPainter({
     required this.text,
@@ -22,6 +25,7 @@ class HorizontalTextPainter extends CustomPainter {
     this.showGrid = false,
     this.rubyList = const [],
     this.kentenList = const [],
+    this.warichuList = const [],
   });
 
   @override
@@ -52,6 +56,11 @@ class HorizontalTextPainter extends CustomPainter {
         ? KentenRenderer.layoutKenten(text, kentenList, style, layouts)
         : <KentenLayout>[];
 
+    // Layout warichu annotations if any
+    final warichuLayouts = warichuList.isNotEmpty
+        ? WarichuRenderer.layoutWarichu(text, warichuList, style, layouts)
+        : <WarichuLayout>[];
+
     // Draw each character
     for (final layout in layouts) {
       _drawCharacter(canvas, layout, fontSize);
@@ -65,6 +74,11 @@ class HorizontalTextPainter extends CustomPainter {
     // Draw kenten marks
     if (kentenLayouts.isNotEmpty) {
       KentenRenderer.render(canvas, kentenLayouts, style);
+    }
+
+    // Draw warichu annotations
+    if (warichuLayouts.isNotEmpty) {
+      WarichuRenderer.render(canvas, warichuLayouts, style);
     }
   }
 
@@ -112,6 +126,7 @@ class HorizontalTextPainter extends CustomPainter {
         maxWidth != oldDelegate.maxWidth ||
         showGrid != oldDelegate.showGrid ||
         rubyList != oldDelegate.rubyList ||
-        kentenList != oldDelegate.kentenList;
+        kentenList != oldDelegate.kentenList ||
+        warichuList != oldDelegate.warichuList;
   }
 }

@@ -26,7 +26,12 @@ Flutter package for Japanese horizontal text (yokogaki - 横書き) layout with 
   - Customizable kenten style
   - Combine with ruby text
 
-- **Warichu (割注)**: Inline annotations (planned)
+- **Warichu (割注)**: Inline annotations
+  - Two-line inline annotations
+  - Automatically splits text into two rows
+  - Displayed inline with main text
+  - Combine with ruby and kenten
+
 - **Rich Text**: Multiple styles in one text block (planned)
 
 ## Installation
@@ -175,6 +180,41 @@ HorizontalText(
 )
 ```
 
+### With Warichu (Inline Annotations)
+
+```dart
+HorizontalText(
+  text: '本文（注釈）の例です。',
+  warichuList: const [
+    Warichu(startIndex: 3, length: 0, warichu: 'ここに注釈'),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 28),
+  ),
+)
+```
+
+### All Features Combined
+
+```dart
+HorizontalText(
+  text: '重要（注）な文章です。',
+  rubyList: const [
+    RubyText(startIndex: 0, length: 2, ruby: 'じゅうよう'),
+  ],
+  kentenList: const [
+    Kenten(startIndex: 0, length: 2, type: KentenType.sesame),
+  ],
+  warichuList: const [
+    Warichu(startIndex: 3, length: 0, warichu: 'ちゅう'),
+  ],
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 26),
+    rubyStyle: TextStyle(fontSize: 12, color: Colors.purple),
+  ),
+)
+```
+
 ### Debug Grid
 
 ```dart
@@ -199,7 +239,7 @@ See the [example](example/) directory for a complete demo app showcasing all fea
 - [x] Line breaking with kinsoku rules
 - [x] Ruby text (furigana) support
 - [x] Kenten (emphasis marks)
-- [ ] Warichu (inline annotations)
+- [x] Warichu (inline annotations)
 - [ ] Rich text with multiple styles
 - [ ] Text selection support
 

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-01-10
+
+### Added
+- **Warichu (inline annotations) support**
+  - `Warichu` model for defining inline annotations
+  - `WarichuRenderer` for laying out and rendering warichu in two-line format
+  - `WarichuLayout` class for warichu positioning information
+  - `warichuList` parameter in `HorizontalText` widget
+  - `warichuStyle` in `HorizontalTextStyle` for customizing warichu appearance
+  - Warichu text automatically split into two lines and displayed inline
+  - Support for combining Ruby, Kenten, and Warichu on the same text
+- Warichu examples in demo app showing inline annotations and feature combinations
+
+### Changed
+- Updated `HorizontalText` widget to accept `warichuList` parameter
+- Updated `HorizontalTextPainter` to render warichu annotations
+- Updated `HorizontalTextStyle` to include `warichuStyle` field
+
 ## [0.3.0] - 2026-01-10
 
 ### Added

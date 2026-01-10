@@ -20,6 +20,9 @@ class HorizontalTextStyle {
   /// Text style for kenten (emphasis marks)
   final TextStyle? kentenStyle;
 
+  /// Text style for warichu (inline annotations)
+  final TextStyle? warichuStyle;
+
   /// Enable kinsoku processing (line breaking rules)
   /// When enabled, characters in burasageAllowed (。、）」】』〉》) will hang,
   /// and other gyoto kinsoku characters (ー) will be pushed in (oikomi).
@@ -42,6 +45,7 @@ class HorizontalTextStyle {
     this.adjustYakumono = true,
     this.rubyStyle,
     this.kentenStyle,
+    this.warichuStyle,
     this.enableKinsoku = true,
     this.enableHalfWidthYakumono = true,
     this.enableGyotoIndent = true,
@@ -56,6 +60,7 @@ class HorizontalTextStyle {
     bool? adjustYakumono,
     TextStyle? rubyStyle,
     TextStyle? kentenStyle,
+    TextStyle? warichuStyle,
     bool? enableKinsoku,
     bool? enableHalfWidthYakumono,
     bool? enableGyotoIndent,
@@ -68,6 +73,7 @@ class HorizontalTextStyle {
       adjustYakumono: adjustYakumono ?? this.adjustYakumono,
       rubyStyle: rubyStyle ?? this.rubyStyle,
       kentenStyle: kentenStyle ?? this.kentenStyle,
+      warichuStyle: warichuStyle ?? this.warichuStyle,
       enableKinsoku: enableKinsoku ?? this.enableKinsoku,
       enableHalfWidthYakumono: enableHalfWidthYakumono ?? this.enableHalfWidthYakumono,
       enableGyotoIndent: enableGyotoIndent ?? this.enableGyotoIndent,
