@@ -365,6 +365,7 @@ class HomePage extends StatelessWidget {
               ],
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 24),
+                lineSpacing: 16.0,
               ),
               maxWidth: 400,
             ),
@@ -387,6 +388,7 @@ class HomePage extends StatelessWidget {
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 24),
                 rubyStyle: const TextStyle(fontSize: 12, color: Colors.red),
+                lineSpacing: 16.0,
               ),
               maxWidth: 400,
             ),
@@ -414,6 +416,7 @@ class HomePage extends StatelessWidget {
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 24),
                 rubyStyle: const TextStyle(fontSize: 12, color: Colors.red),
+                lineSpacing: 16.0,
               ),
               maxWidth: 400,
             ),
