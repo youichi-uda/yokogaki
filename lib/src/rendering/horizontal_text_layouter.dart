@@ -64,7 +64,10 @@ class HorizontalTextLayouter {
 
     // Apply indent (字下げ) - shift starting X position
     final indentOffset = style.indent * fontSize;
-    double currentX = indentOffset; // Horizontal position (increases to the right)
+    // Apply firstLineIndent (段落字下げ) - shift starting X position for FIRST line only
+    final firstLineIndentOffset = style.firstLineIndent * fontSize;
+    // First line gets both indent and firstLineIndent
+    double currentX = indentOffset + firstLineIndentOffset;
     double currentY = 0.0; // Vertical position (increases downward for new lines)
     int lineStartIndex = 0;
     bool shouldBreakAfterCurrentChar = false; // Flag for burasage (hanging)
@@ -75,6 +78,7 @@ class HorizontalTextLayouter {
       // Handle newline characters
       if (char == '\n') {
         // Move to next line (down)
+        // Subsequent lines only get indent, not firstLineIndent
         currentX = indentOffset;
         currentY += fontSize + style.lineSpacing;
         lineStartIndex = i + 1;
@@ -99,6 +103,7 @@ class HorizontalTextLayouter {
               layouts.removeWhere((layout) => layout.textIndex >= actualBreakPos);
 
               // Reset current position to beginning of new line
+              // Subsequent lines only get indent, not firstLineIndent
               currentX = indentOffset;
               currentY += fontSize + style.lineSpacing;
               lineStartIndex = actualBreakPos;
@@ -118,6 +123,7 @@ class HorizontalTextLayouter {
               }
             } else {
               // Break at current position
+              // Subsequent lines only get indent, not firstLineIndent
               currentX = indentOffset;
               currentY += fontSize + style.lineSpacing;
               lineStartIndex = i;
@@ -125,6 +131,7 @@ class HorizontalTextLayouter {
           }
         } else {
           // Simple line breaking without kinsoku
+          // Subsequent lines only get indent, not firstLineIndent
           currentX = indentOffset;
           currentY += fontSize + style.lineSpacing;
           lineStartIndex = i;
@@ -150,6 +157,7 @@ class HorizontalTextLayouter {
 
       // Check if we should break after this character (burasage case)
       if (shouldBreakAfterCurrentChar) {
+        // Subsequent lines only get indent, not firstLineIndent
         currentX = indentOffset;
         currentY += fontSize + style.lineSpacing;
         lineStartIndex = i + 1;

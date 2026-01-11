@@ -6,6 +6,7 @@ library;
 export 'src/widgets/horizontal_text.dart';
 export 'src/widgets/horizontal_rich_text.dart';
 export 'src/widgets/selectable_horizontal_text.dart';
+export 'src/widgets/selection_area_horizontal_text.dart';
 
 // Models
 export 'src/models/horizontal_text_style.dart';

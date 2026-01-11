@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../models/text_decoration.dart';
 import '../models/horizontal_text_style.dart';

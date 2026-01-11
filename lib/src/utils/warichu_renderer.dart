@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/painting.dart';
 import '../models/warichu.dart';
 import '../models/horizontal_text_style.dart';

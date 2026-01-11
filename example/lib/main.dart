@@ -813,6 +813,55 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 32),
             const Text(
+              'SelectionArea Integration (Selection API)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Use with SelectionArea to select across multiple widgets',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.indigo.shade200),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SelectionArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SelectableText(
+                      '通常の SelectableText',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 60,
+                      child: SelectionAreaHorizontalText(
+                        text: '日本語の横書きテキスト',
+                        rubyList: const [
+                          RubyText(startIndex: 0, length: 3, ruby: 'にほんご'),
+                          RubyText(startIndex: 4, length: 3, ruby: 'よこがき'),
+                        ],
+                        style: HorizontalTextStyle(
+                          baseStyle: const TextStyle(fontSize: 24),
+                          rubyStyle: const TextStyle(fontSize: 12, color: Colors.red),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const SelectableText(
+                      '上下のテキストをドラッグで一括選択できます。',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
               'Gaiji (外字 - Custom Character Images)',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -833,6 +882,104 @@ class _HomePageState extends State<HomePage> {
               style: HorizontalTextStyle(
                 baseStyle: const TextStyle(fontSize: 28),
               ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Long text with gaiji in middle:',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: '日本語の文章の中に〓入という旧字体を使った例文です。',
+              gaijiList: const [
+                Gaiji(
+                  startIndex: 9, // 「〓」の位置（0から数えて9番目）
+                  image: AssetImage('assets/image.png'),
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+              ),
+              showGrid: true,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Multi-line text (maxWidth: 300):',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: '昔々あるところに、〓入という技術を持つ職人がいました。その職人は毎日丁寧に仕事をしていました。',
+              gaijiList: const [
+                Gaiji(
+                  startIndex: 9, // 「〓」の位置（0から数えて9番目）
+                  image: AssetImage('assets/image.png'),
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 24),
+              ),
+              maxWidth: 300,
+              showGrid: true,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Small font (18px):',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: 'この文章には〓入という外字が含まれています。',
+              gaijiList: const [
+                Gaiji(
+                  startIndex: 6, // 「〓」の位置
+                  image: AssetImage('assets/image.png'),
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 18),
+              ),
+              showGrid: true,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Gaiji after line break (2nd line):',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: 'あいうえおかきくけこ〓入さしすせそ', // 〓は10番目
+              gaijiList: const [
+                Gaiji(
+                  startIndex: 10, // 「〓」の位置（0から数えて10番目）
+                  image: AssetImage('assets/image.png'),
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+              ),
+              maxWidth: 200, // 狭いmaxWidthで強制的に改行
+              showGrid: true,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Gaiji on 3rd line:',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            HorizontalText(
+              text: 'あいうえおかきくけこさしすせそたちつてと〓入なにぬねの', // 〓は20番目
+              gaijiList: const [
+                Gaiji(
+                  startIndex: 20, // 「〓」の位置（0から数えて20番目）
+                  image: AssetImage('assets/image.png'),
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 24),
+              ),
+              maxWidth: 200, // 狭いmaxWidthで複数行に
+              showGrid: true,
             ),
             const SizedBox(height: 32),
           ],

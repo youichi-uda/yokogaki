@@ -480,6 +480,7 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
 
     final menuItems = <PopupMenuEntry<void>>[
       PopupMenuItem(
+        onTap: _copySelection,
         child: Row(
           children: [
             const Icon(Icons.copy, size: 20),
@@ -494,9 +495,9 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
             ),
           ],
         ),
-        onTap: _copySelection,
       ),
       PopupMenuItem(
+        onTap: _selectAll,
         child: Row(
           children: [
             const Icon(Icons.select_all, size: 20),
@@ -511,7 +512,6 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
             ),
           ],
         ),
-        onTap: _selectAll,
       ),
     ];
 

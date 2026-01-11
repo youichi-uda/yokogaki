@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 import 'package:flutter/painting.dart';
 import 'package:kinsoku/kinsoku.dart';
 import '../models/kenten.dart';
@@ -268,13 +267,8 @@ class KentenRenderer {
     double size,
     Paint paint,
   ) {
-    final half = size / 2;
     final rect = Rect.fromCenter(center: center, width: size, height: size);
-    if (paint.style == PaintingStyle.fill) {
-      canvas.drawRect(rect, paint);
-    } else {
-      canvas.drawRect(rect, paint);
-    }
+    canvas.drawRect(rect, paint);
   }
 
   /// Draw a 5-pointed star

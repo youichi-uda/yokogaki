@@ -45,13 +45,27 @@ class HorizontalTextStyle {
   /// - [TextAlignment.end]: Right alignment (地付き)
   final TextAlignment alignment;
 
-  /// Text indent in character units (字下げ)
+  /// Text indent in character units (字下げ) - applies to ALL lines
   ///
   /// For horizontal text, this shifts the starting position right by
-  /// `indent * fontSize` pixels.
+  /// `indent * fontSize` pixels for every line.
   ///
-  /// Example: `indent: 2` shifts text right by 2 character widths.
+  /// Example: `indent: 2` shifts all lines right by 2 character widths.
+  ///
+  /// See also: [firstLineIndent] for Japanese-style paragraph indentation.
   final int indent;
+
+  /// First line indent in character units (段落字下げ)
+  ///
+  /// For horizontal text, this shifts only the FIRST line's starting position
+  /// right by `firstLineIndent * fontSize` pixels. Subsequent lines start at
+  /// the normal position (affected only by [indent] if set).
+  ///
+  /// This is the traditional Japanese paragraph indentation style where only
+  /// the first line of a paragraph is indented.
+  ///
+  /// Example: `firstLineIndent: 1` shifts only the first line right by 1 character width.
+  final int firstLineIndent;
 
   const HorizontalTextStyle({
     this.baseStyle = const TextStyle(),
@@ -67,6 +81,7 @@ class HorizontalTextStyle {
     this.enableKerning = true,
     this.alignment = TextAlignment.center,
     this.indent = 0,
+    this.firstLineIndent = 0,
   });
 
   /// Create a copy with modified properties
@@ -84,6 +99,7 @@ class HorizontalTextStyle {
     bool? enableKerning,
     TextAlignment? alignment,
     int? indent,
+    int? firstLineIndent,
   }) {
     return HorizontalTextStyle(
       baseStyle: baseStyle ?? this.baseStyle,
@@ -99,6 +115,7 @@ class HorizontalTextStyle {
       enableKerning: enableKerning ?? this.enableKerning,
       alignment: alignment ?? this.alignment,
       indent: indent ?? this.indent,
+      firstLineIndent: firstLineIndent ?? this.firstLineIndent,
     );
   }
 }
