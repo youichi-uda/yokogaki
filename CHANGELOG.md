@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-01-11
+
+### Added
+- **Gaiji (外字) support** - Image-based custom characters
+  - `Gaiji` model for specifying custom character images
+  - `gaijiList` parameter in `HorizontalText` widget
+  - Supports multiple image sources: `AssetImage`, `NetworkImage`, `FileImage`, `MemoryImage`
+  - Gaiji images automatically scale to match font size
+  - Proper text baseline alignment for gaiji images
+  - Placeholder characters are replaced with images
+
+## [0.9.2] - 2026-01-11
+
+### Changed
+- Updated README with latest features documentation
+- Added TextAlignment and TextDecoration usage examples
+- Added Related Packages section and badges
+- Updated installation version to ^0.9.0
+- Added all KentenStyle options to documentation
+- Updated Roadmap with completed features
+
+## [0.9.1] - 2026-01-11
+
+### Fixed
+- Removed unused `dart:ui` imports from kenten_renderer.dart, decoration_renderer.dart, warichu_renderer.dart
+- Removed unused local variable `half` in kenten_renderer.dart
+- Fixed `sort_child_properties_last` lint warnings in selectable_horizontal_text.dart
+
+## [0.9.0] - 2026-01-11
+
+### Added
+- **Line alignment support** (地付き/天付き)
+  - `alignment` property in `HorizontalTextStyle`
+  - `TextAlignment.start`: Align line to left (default horizontal behavior)
+  - `TextAlignment.center`: Center alignment
+  - `TextAlignment.end` (地付き): Align line to right
+- Alignment demo page in example app
+- Demo for combined overline + ruby annotations
+
+### Fixed
+- Overline and wavy overline positioning (now closer to text with fixed offset)
+- Underline and wavy underline positioning (now closer to text with fixed offset)
+- Ruby position adjustment when overline decoration is present
+- Layout cache now includes alignment in cache key comparison
+
+### Changed
+- Uses kinsoku package's `TextAlignment` enum for alignment values
+
 ## [0.8.0] - 2026-01-10
 
 ### Added
