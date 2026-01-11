@@ -1,14 +1,17 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
 import '../models/warichu.dart';
 import '../models/text_decoration.dart';
+import '../models/gaiji.dart';
 import 'horizontal_text_layouter.dart';
 import '../utils/ruby_renderer.dart';
 import '../utils/kenten_renderer.dart';
 import '../utils/warichu_renderer.dart';
 import '../utils/decoration_renderer.dart';
+import '../utils/gaiji_renderer.dart';
 
 /// Custom painter for horizontal Japanese text
 class HorizontalTextPainter extends CustomPainter {
@@ -20,6 +23,9 @@ class HorizontalTextPainter extends CustomPainter {
   final List<Kenten> kentenList;
   final List<Warichu> warichuList;
   final List<TextDecorationAnnotation> decorationList;
+  final List<Gaiji> gaijiList;
+  final Map<int, ui.Image>? resolvedGaijiImages;
+  final double topOffset;
 
   HorizontalTextPainter({
     required this.text,
@@ -30,6 +36,9 @@ class HorizontalTextPainter extends CustomPainter {
     this.kentenList = const [],
     this.warichuList = const [],
     this.decorationList = const [],
+    this.gaijiList = const [],
+    this.resolvedGaijiImages,
+    this.topOffset = 0,
   });
 
   @override
@@ -72,9 +81,27 @@ class HorizontalTextPainter extends CustomPainter {
         ? WarichuRenderer.layoutWarichu(text, warichuList, style, layouts)
         : <WarichuLayout>[];
 
-    // Draw each character
+    // Create set of indices that are replaced by gaiji
+    final gaijiIndices = <int>{};
+    for (final g in gaijiList) {
+      for (int i = g.startIndex; i < g.endIndex; i++) {
+        gaijiIndices.add(i);
+      }
+    }
+
+    // Draw each character (skip gaiji characters)
     for (final layout in layouts) {
-      _drawCharacter(canvas, layout, fontSize);
+      if (!gaijiIndices.contains(layout.textIndex)) {
+        _drawCharacter(canvas, layout, fontSize);
+      }
+    }
+
+    // Draw gaiji images if resolved
+    if (resolvedGaijiImages != null && resolvedGaijiImages!.isNotEmpty && gaijiList.isNotEmpty) {
+      final gaijiLayouts = _buildGaijiLayouts(layouts, fontSize);
+      if (gaijiLayouts.isNotEmpty) {
+        GaijiRenderer.drawGaijiList(canvas, gaijiLayouts, fontSize, style.baseStyle);
+      }
     }
 
     // Draw ruby text
@@ -152,6 +179,42 @@ class HorizontalTextPainter extends CustomPainter {
     }
   }
 
+  /// Build gaiji layouts from character layouts and resolved images
+  List<GaijiLayout> _buildGaijiLayouts(
+    List<CharacterLayout> characterLayouts,
+    double fontSize,
+  ) {
+    final layouts = <GaijiLayout>[];
+
+    for (int i = 0; i < gaijiList.length; i++) {
+      final gaijiDef = gaijiList[i];
+      final image = resolvedGaijiImages![i];
+      if (image == null) continue;
+
+      // Find the character layout at the gaiji position
+      CharacterLayout? charLayout;
+      for (final layout in characterLayouts) {
+        if (layout.textIndex == gaijiDef.startIndex) {
+          charLayout = layout;
+          break;
+        }
+      }
+
+      if (charLayout != null) {
+        // Use the same position as regular text (no offset)
+        layouts.add(GaijiLayout(
+          position: charLayout.position,
+          width: gaijiDef.width ?? fontSize,
+          height: gaijiDef.height ?? fontSize,
+          image: image,
+          textIndex: gaijiDef.startIndex,
+        ));
+      }
+    }
+
+    return layouts;
+  }
+
   @override
   bool shouldRepaint(HorizontalTextPainter oldDelegate) {
     return text != oldDelegate.text ||
@@ -161,6 +224,9 @@ class HorizontalTextPainter extends CustomPainter {
         rubyList != oldDelegate.rubyList ||
         kentenList != oldDelegate.kentenList ||
         warichuList != oldDelegate.warichuList ||
-        decorationList != oldDelegate.decorationList;
+        decorationList != oldDelegate.decorationList ||
+        gaijiList != oldDelegate.gaijiList ||
+        resolvedGaijiImages != oldDelegate.resolvedGaijiImages ||
+        topOffset != oldDelegate.topOffset;
   }
 }

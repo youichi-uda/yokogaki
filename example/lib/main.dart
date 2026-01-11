@@ -812,6 +812,29 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 32),
+            const Text(
+              'Gaiji (外字 - Custom Character Images)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Replace placeholder characters with custom images. Example: 挿 → 插 (old form)',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            HorizontalText(
+              text: '「〓入」の旧字体の例',
+              gaijiList: const [
+                Gaiji(
+                  startIndex: 1, // 「〓」の位置
+                  image: AssetImage('assets/image.png'),
+                ),
+              ],
+              style: HorizontalTextStyle(
+                baseStyle: const TextStyle(fontSize: 28),
+              ),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
