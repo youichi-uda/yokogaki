@@ -72,6 +72,15 @@ class HorizontalTextLayouter {
     for (int i = 0; i < text.length; i++) {
       final char = text[i];
 
+      // Handle newline characters
+      if (char == '\n') {
+        // Move to next line (down)
+        currentX = indentOffset;
+        currentY += fontSize + style.lineSpacing;
+        lineStartIndex = i + 1;
+        continue;
+      }
+
       // Check if we need to break the line
       if (maxWidth > 0 && currentX + fontSize > maxWidth) {
         if (style.enableKinsoku) {
