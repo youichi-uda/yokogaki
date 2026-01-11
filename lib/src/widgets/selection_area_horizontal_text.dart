@@ -317,10 +317,12 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
     if (_characterLayouts == null || _characterLayouts!.isEmpty) return;
 
     final canvas = context.canvas;
+    canvas.save();
+    canvas.translate(offset.dx, offset.dy);
 
     // Draw selection highlight
     if (_selectionStart >= 0 && _selectionEnd >= 0 && _selectionStart != _selectionEnd) {
-      _paintSelection(canvas, offset);
+      _paintSelection(canvas);
     }
 
     // Draw text using HorizontalTextPainter
@@ -335,9 +337,11 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
       gaijiList: _gaijiList,
     );
     painter.paint(canvas, size);
+
+    canvas.restore();
   }
 
-  void _paintSelection(Canvas canvas, Offset offset) {
+  void _paintSelection(Canvas canvas) {
     final paint = Paint()..color = _selectionColor;
     final fontSize = _style.baseStyle.fontSize ?? 16.0;
 
@@ -353,8 +357,8 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
     for (final layout in _characterLayouts!) {
       if (layout.textIndex >= start && layout.textIndex < end) {
         final rect = Rect.fromLTWH(
-          offset.dx + layout.position.dx,
-          offset.dy + layout.position.dy + topOffset,
+          layout.position.dx,
+          layout.position.dy + topOffset,
           fontSize,
           fontSize,
         );
