@@ -846,7 +846,7 @@ class _HomePageState extends State<HomePage> {
                           RubyText(startIndex: 4, length: 3, ruby: 'よこがき'),
                         ],
                         style: HorizontalTextStyle(
-                          baseStyle: const TextStyle(fontSize: 24),
+                          baseStyle: const TextStyle(fontSize: 24, color: Colors.black),
                           rubyStyle: const TextStyle(fontSize: 12, color: Colors.red),
                         ),
                       ),
