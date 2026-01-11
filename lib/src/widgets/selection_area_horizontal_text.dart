@@ -8,7 +8,6 @@ import '../models/warichu.dart';
 import '../models/text_decoration.dart';
 import '../models/gaiji.dart';
 import '../rendering/horizontal_text_layouter.dart';
-import '../rendering/horizontal_text_painter.dart';
 
 /// A horizontal text widget that integrates with Flutter's Selection API.
 ///
@@ -273,14 +272,14 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   @override
   void performLayout() {
     _ensureLayout(constraints);
-    size = _computedSize ?? Size.zero;
+    // Constrain computed size to the given constraints
+    size = constraints.constrain(_computedSize ?? Size.zero);
     _updateSelectionGeometry();
   }
 
   void _ensureLayout(BoxConstraints constraints) {
     if (_characterLayouts != null && _computedSize != null) return;
 
-    final fontSize = _style.baseStyle.fontSize ?? 16.0;
     final effectiveMaxWidth = _maxWidth > 0 ? _maxWidth : constraints.maxWidth;
 
     _characterLayouts = HorizontalTextLayouter.layout(
@@ -296,23 +295,24 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
       return;
     }
 
+    // Get actual text height
+    _textPainter.text = TextSpan(text: 'あ', style: _style.baseStyle);
+    _textPainter.layout();
+    final textHeight = _textPainter.height;
+
     double maxX = 0;
     double maxY = 0;
 
     for (final layout in _characterLayouts!) {
-      maxX = math.max(maxX, layout.position.dx + fontSize);
-      maxY = math.max(maxY, layout.position.dy + fontSize);
+      _textPainter.text = TextSpan(text: layout.character, style: _style.baseStyle);
+      _textPainter.layout();
+      maxX = math.max(maxX, layout.position.dx + _textPainter.width);
+      maxY = math.max(maxY, layout.position.dy + textHeight);
     }
-
-    // Add ruby space
-    final rubyFontSize = _style.rubyStyle?.fontSize ?? fontSize * 0.5;
-    final topOffset = _rubyList.isNotEmpty || _kentenList.isNotEmpty
-        ? rubyFontSize + 2.0
-        : 0.0;
 
     _computedSize = Size(
       effectiveMaxWidth > 0 ? math.min(maxX, effectiveMaxWidth) : maxX,
-      maxY + topOffset,
+      maxY,
     );
   }
 
@@ -329,18 +329,8 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
       _paintSelection(canvas);
     }
 
-    // Draw text using HorizontalTextPainter
-    final painter = HorizontalTextPainter(
-      text: _text,
-      style: _style,
-      maxWidth: _maxWidth,
-      rubyList: _rubyList,
-      kentenList: _kentenList,
-      warichuList: _warichuList,
-      decorationList: _decorationList,
-      gaijiList: _gaijiList,
-    );
-    painter.paint(canvas, size);
+    // Draw text using the same layouts as selection
+    _paintText(canvas);
 
     canvas.restore();
 
@@ -348,37 +338,54 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
     _paintHandleLayers(context, offset);
   }
 
+  // Reusable TextPainter instance
+  static final TextPainter _textPainter = TextPainter(
+    textDirection: TextDirection.ltr,
+  );
+
+  void _paintText(Canvas canvas) {
+    // Draw each character
+    for (final layout in _characterLayouts!) {
+      _textPainter.text = TextSpan(
+        text: layout.character,
+        style: _style.baseStyle,
+      );
+      _textPainter.layout();
+      _textPainter.paint(canvas, layout.position);
+    }
+  }
+
   void _paintHandleLayers(PaintingContext context, Offset offset) {
     if (_selectionStart < 0 || _selectionEnd < 0 || _selectionStart == _selectionEnd) {
       return;
     }
 
-    final fontSize = _style.baseStyle.fontSize ?? 16.0;
+    // Get actual text height
+    _textPainter.text = TextSpan(text: 'あ', style: _style.baseStyle);
+    _textPainter.layout();
+    final textHeight = _textPainter.height;
+
     final start = math.min(_selectionStart, _selectionEnd);
     final end = math.max(_selectionStart, _selectionEnd);
-
-    // Calculate top offset for ruby/kenten
-    final rubyFontSize = _style.rubyStyle?.fontSize ?? fontSize * 0.5;
-    final topOffset = _rubyList.isNotEmpty || _kentenList.isNotEmpty
-        ? rubyFontSize + 2.0
-        : 0.0;
 
     Offset? startOffset;
     Offset? endOffset;
 
     for (final layout in _characterLayouts!) {
       if (layout.textIndex == start) {
-        // Start handle: left edge of first character, at baseline (bottom)
+        // Start handle: left edge of first character, at bottom
         startOffset = Offset(
           offset.dx + layout.position.dx,
-          offset.dy + layout.position.dy + topOffset + fontSize,
+          offset.dy + layout.position.dy + textHeight,
         );
       }
       if (layout.textIndex == end - 1) {
-        // End handle: right edge of last character, at baseline (bottom)
+        // End handle: right edge of last character, at bottom
+        _textPainter.text = TextSpan(text: layout.character, style: _style.baseStyle);
+        _textPainter.layout();
         endOffset = Offset(
-          offset.dx + layout.position.dx + fontSize,
-          offset.dy + layout.position.dy + topOffset + fontSize,
+          offset.dx + layout.position.dx + _textPainter.width,
+          offset.dy + layout.position.dy + textHeight,
         );
       }
     }
@@ -404,24 +411,26 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
 
   void _paintSelection(Canvas canvas) {
     final paint = Paint()..color = _selectionColor;
-    final fontSize = _style.baseStyle.fontSize ?? 16.0;
 
     final start = math.min(_selectionStart, _selectionEnd);
     final end = math.max(_selectionStart, _selectionEnd);
 
-    // Calculate top offset for ruby/kenten
-    final rubyFontSize = _style.rubyStyle?.fontSize ?? fontSize * 0.5;
-    final topOffset = _rubyList.isNotEmpty || _kentenList.isNotEmpty
-        ? rubyFontSize + 2.0
-        : 0.0;
+    // Use actual text metrics for selection size
+    _textPainter.text = TextSpan(text: 'あ', style: _style.baseStyle);
+    _textPainter.layout();
+    final textHeight = _textPainter.height;
 
     for (final layout in _characterLayouts!) {
       if (layout.textIndex >= start && layout.textIndex < end) {
+        // Measure actual character width
+        _textPainter.text = TextSpan(text: layout.character, style: _style.baseStyle);
+        _textPainter.layout();
+
         final rect = Rect.fromLTWH(
           layout.position.dx,
-          layout.position.dy + topOffset,
-          fontSize,
-          fontSize,
+          layout.position.dy,
+          _textPainter.width,
+          textHeight,
         );
         canvas.drawRect(rect, paint);
       }
@@ -555,7 +564,11 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
 
       final firstLayout = _characterLayouts!.first;
       final lastLayout = _characterLayouts!.last;
-      final fontSize = _style.baseStyle.fontSize ?? 16.0;
+
+      // Measure last character width
+      _textPainter.text = TextSpan(text: lastLayout.character, style: _style.baseStyle);
+      _textPainter.layout();
+      final lastCharWidth = _textPainter.width;
 
       // For horizontal text (left to right), check X position
       if (localPosition.dx < firstLayout.position.dx) {
@@ -568,7 +581,7 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
         _updateSelectionGeometry();
         markNeedsPaint();
         return SelectionResult.previous;
-      } else if (localPosition.dx > lastLayout.position.dx + fontSize) {
+      } else if (localPosition.dx > lastLayout.position.dx + lastCharWidth) {
         // After content (to the right)
         if (isStart) {
           _selectionStart = _text.length;
@@ -600,25 +613,26 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   int _getCharacterIndexAt(Offset localPosition) {
     if (_characterLayouts == null || _characterLayouts!.isEmpty) return -1;
 
-    final fontSize = _style.baseStyle.fontSize ?? 16.0;
-
-    // Calculate top offset for ruby/kenten
-    final rubyFontSize = _style.rubyStyle?.fontSize ?? fontSize * 0.5;
-    final topOffset = _rubyList.isNotEmpty || _kentenList.isNotEmpty
-        ? rubyFontSize + 2.0
-        : 0.0;
+    // Get actual text height
+    _textPainter.text = TextSpan(text: 'あ', style: _style.baseStyle);
+    _textPainter.layout();
+    final textHeight = _textPainter.height;
 
     double closestDistance = double.infinity;
     int closestIndex = -1;
 
     for (final layout in _characterLayouts!) {
+      _textPainter.text = TextSpan(text: layout.character, style: _style.baseStyle);
+      _textPainter.layout();
+      final charWidth = _textPainter.width;
+
       final charCenter = Offset(
-        layout.position.dx + fontSize / 2,
-        layout.position.dy + topOffset + fontSize / 2,
+        layout.position.dx + charWidth / 2,
+        layout.position.dy + textHeight / 2,
       );
       final distance = (charCenter - localPosition).distance;
 
-      if (distance < closestDistance && distance < fontSize * 1.5) {
+      if (distance < closestDistance && distance < textHeight * 1.5) {
         closestDistance = distance;
         closestIndex = layout.textIndex;
       }
@@ -641,31 +655,33 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
         hasContent: _text.isNotEmpty,
       );
     } else {
-      final fontSize = _style.baseStyle.fontSize ?? 16.0;
+      // Get actual text height
+      _textPainter.text = TextSpan(text: 'あ', style: _style.baseStyle);
+      _textPainter.layout();
+      final textHeight = _textPainter.height;
+
       final start = math.min(_selectionStart, _selectionEnd);
       final end = math.max(_selectionStart, _selectionEnd);
-
-      // Calculate top offset for ruby/kenten
-      final rubyFontSize = _style.rubyStyle?.fontSize ?? fontSize * 0.5;
-      final topOffset = _rubyList.isNotEmpty || _kentenList.isNotEmpty
-          ? rubyFontSize + 2.0
-          : 0.0;
 
       // Find start and end positions
       Offset? startOffset;
       Offset? endOffset;
+      double endCharWidth = 0;
 
       for (final layout in _characterLayouts!) {
         if (layout.textIndex == start) {
           startOffset = Offset(
             layout.position.dx,
-            layout.position.dy + topOffset,
+            layout.position.dy,
           );
         }
         if (layout.textIndex == end - 1) {
+          _textPainter.text = TextSpan(text: layout.character, style: _style.baseStyle);
+          _textPainter.layout();
+          endCharWidth = _textPainter.width;
           endOffset = Offset(
-            layout.position.dx + fontSize,
-            layout.position.dy + topOffset + fontSize,
+            layout.position.dx + endCharWidth,
+            layout.position.dy + textHeight,
           );
         }
       }
@@ -673,11 +689,13 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
       // Use fallback positions if not found
       if (startOffset == null && _characterLayouts!.isNotEmpty) {
         final firstLayout = _characterLayouts!.first;
-        startOffset = Offset(firstLayout.position.dx, firstLayout.position.dy + topOffset);
+        startOffset = Offset(firstLayout.position.dx, firstLayout.position.dy);
       }
       if (endOffset == null && _characterLayouts!.isNotEmpty) {
         final lastLayout = _characterLayouts!.last;
-        endOffset = Offset(lastLayout.position.dx + fontSize, lastLayout.position.dy + topOffset + fontSize);
+        _textPainter.text = TextSpan(text: lastLayout.character, style: _style.baseStyle);
+        _textPainter.layout();
+        endOffset = Offset(lastLayout.position.dx + _textPainter.width, lastLayout.position.dy + textHeight);
       }
 
       if (startOffset == null || endOffset == null) {
@@ -691,12 +709,12 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
           hasContent: true,
           startSelectionPoint: SelectionPoint(
             localPosition: startOffset,
-            lineHeight: fontSize,
+            lineHeight: textHeight,
             handleType: TextSelectionHandleType.left,
           ),
           endSelectionPoint: SelectionPoint(
-            localPosition: Offset(endOffset.dx, startOffset.dy + fontSize),
-            lineHeight: fontSize,
+            localPosition: Offset(endOffset.dx, startOffset.dy + textHeight),
+            lineHeight: textHeight,
             handleType: TextSelectionHandleType.right,
           ),
         );
