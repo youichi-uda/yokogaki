@@ -644,14 +644,9 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   void _updateSelectionGeometry() {
     final oldGeometry = _selectionGeometry;
 
-    if (_selectionStart < 0 || _selectionEnd < 0 || _characterLayouts == null) {
+    if (_selectionStart < 0 || _selectionEnd < 0 || _characterLayouts == null || _characterLayouts!.isEmpty) {
       _selectionGeometry = SelectionGeometry(
         status: SelectionStatus.none,
-        hasContent: _text.isNotEmpty,
-      );
-    } else if (_selectionStart == _selectionEnd) {
-      _selectionGeometry = SelectionGeometry(
-        status: SelectionStatus.collapsed,
         hasContent: _text.isNotEmpty,
       );
     } else {
@@ -662,11 +657,11 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
 
       final start = math.min(_selectionStart, _selectionEnd);
       final end = math.max(_selectionStart, _selectionEnd);
+      final isCollapsed = _selectionStart == _selectionEnd;
 
       // Find start and end positions
       Offset? startOffset;
       Offset? endOffset;
-      double endCharWidth = 0;
 
       for (final layout in _characterLayouts!) {
         if (layout.textIndex == start) {
@@ -675,50 +670,45 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
             layout.position.dy,
           );
         }
-        if (layout.textIndex == end - 1) {
+        // For collapsed selection, end position is same as start
+        final endIndex = isCollapsed ? start : end - 1;
+        if (layout.textIndex == endIndex) {
           _textPainter.text = TextSpan(text: layout.character, style: _style.baseStyle);
           _textPainter.layout();
-          endCharWidth = _textPainter.width;
+          final charWidth = _textPainter.width;
           endOffset = Offset(
-            layout.position.dx + endCharWidth,
+            isCollapsed ? layout.position.dx : layout.position.dx + charWidth,
             layout.position.dy + textHeight,
           );
         }
       }
 
       // Use fallback positions if not found
-      if (startOffset == null && _characterLayouts!.isNotEmpty) {
+      if (startOffset == null) {
         final firstLayout = _characterLayouts!.first;
         startOffset = Offset(firstLayout.position.dx, firstLayout.position.dy);
       }
-      if (endOffset == null && _characterLayouts!.isNotEmpty) {
+      if (endOffset == null) {
         final lastLayout = _characterLayouts!.last;
         _textPainter.text = TextSpan(text: lastLayout.character, style: _style.baseStyle);
         _textPainter.layout();
         endOffset = Offset(lastLayout.position.dx + _textPainter.width, lastLayout.position.dy + textHeight);
       }
 
-      if (startOffset == null || endOffset == null) {
-        _selectionGeometry = SelectionGeometry(
-          status: SelectionStatus.none,
-          hasContent: _text.isNotEmpty,
-        );
-      } else {
-        _selectionGeometry = SelectionGeometry(
-          status: SelectionStatus.uncollapsed,
-          hasContent: true,
-          startSelectionPoint: SelectionPoint(
-            localPosition: startOffset,
-            lineHeight: textHeight,
-            handleType: TextSelectionHandleType.left,
-          ),
-          endSelectionPoint: SelectionPoint(
-            localPosition: Offset(endOffset.dx, startOffset.dy + textHeight),
-            lineHeight: textHeight,
-            handleType: TextSelectionHandleType.right,
-          ),
-        );
-      }
+      _selectionGeometry = SelectionGeometry(
+        status: isCollapsed ? SelectionStatus.collapsed : SelectionStatus.uncollapsed,
+        hasContent: true,
+        startSelectionPoint: SelectionPoint(
+          localPosition: startOffset,
+          lineHeight: textHeight,
+          handleType: TextSelectionHandleType.left,
+        ),
+        endSelectionPoint: SelectionPoint(
+          localPosition: Offset(endOffset.dx, startOffset.dy + textHeight),
+          lineHeight: textHeight,
+          handleType: TextSelectionHandleType.right,
+        ),
+      );
     }
 
     if (oldGeometry != _selectionGeometry) {
