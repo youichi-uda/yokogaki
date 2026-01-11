@@ -368,12 +368,14 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
 
     for (final layout in _characterLayouts!) {
       if (layout.textIndex == start) {
+        // Start handle: left edge of first character, at baseline (bottom)
         startOffset = Offset(
           offset.dx + layout.position.dx,
-          offset.dy + layout.position.dy + topOffset,
+          offset.dy + layout.position.dy + topOffset + fontSize,
         );
       }
       if (layout.textIndex == end - 1) {
+        // End handle: right edge of last character, at baseline (bottom)
         endOffset = Offset(
           offset.dx + layout.position.dx + fontSize,
           offset.dy + layout.position.dy + topOffset + fontSize,
@@ -583,9 +585,10 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
 
     if (isStart) {
       _selectionStart = clampedIndex;
-      if (_selectionEnd < 0) _selectionEnd = clampedIndex;
+      if (_selectionEnd < 0) _selectionEnd = clampedIndex + 1;
     } else {
-      _selectionEnd = clampedIndex;
+      // End is exclusive, so add 1 to include the character under the cursor
+      _selectionEnd = (clampedIndex + 1).clamp(0, _text.length);
       if (_selectionStart < 0) _selectionStart = clampedIndex;
     }
 
