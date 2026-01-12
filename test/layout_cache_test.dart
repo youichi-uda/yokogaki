@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kinsoku/kinsoku.dart';
 import 'package:yokogaki/src/utils/layout_cache.dart';
 import 'package:yokogaki/src/models/horizontal_text_style.dart';
 import 'package:yokogaki/src/rendering/horizontal_text_layouter.dart';
@@ -100,6 +101,42 @@ void main() {
 
       expect(key1, equals(key2));
     });
+
+    test('should not be equal when alignment differs', () {
+      const style1 = HorizontalTextStyle(alignment: TextAlignment.start);
+      const style2 = HorizontalTextStyle(alignment: TextAlignment.end);
+      const key1 = LayoutCacheKey(text: 'テスト', style: style1, maxWidth: 100);
+      const key2 = LayoutCacheKey(text: 'テスト', style: style2, maxWidth: 100);
+
+      expect(key1, isNot(equals(key2)));
+    });
+
+    test('should not be equal when characterSpacing differs', () {
+      const style1 = HorizontalTextStyle(characterSpacing: 0.0);
+      const style2 = HorizontalTextStyle(characterSpacing: 5.0);
+      const key1 = LayoutCacheKey(text: 'テスト', style: style1, maxWidth: 100);
+      const key2 = LayoutCacheKey(text: 'テスト', style: style2, maxWidth: 100);
+
+      expect(key1, isNot(equals(key2)));
+    });
+
+    test('should not be equal when lineSpacing differs', () {
+      const style1 = HorizontalTextStyle(lineSpacing: 0.0);
+      const style2 = HorizontalTextStyle(lineSpacing: 10.0);
+      const key1 = LayoutCacheKey(text: 'テスト', style: style1, maxWidth: 100);
+      const key2 = LayoutCacheKey(text: 'テスト', style: style2, maxWidth: 100);
+
+      expect(key1, isNot(equals(key2)));
+    });
+
+    test('should not be equal when enableKinsoku differs', () {
+      const style1 = HorizontalTextStyle(enableKinsoku: true);
+      const style2 = HorizontalTextStyle(enableKinsoku: false);
+      const key1 = LayoutCacheKey(text: 'テスト', style: style1, maxWidth: 100);
+      const key2 = LayoutCacheKey(text: 'テスト', style: style2, maxWidth: 100);
+
+      expect(key1, isNot(equals(key2)));
+    });
   });
 
   group('LayoutCache', () {
@@ -181,6 +218,34 @@ void main() {
       // Newest entries should still exist
       const newKey = LayoutCacheKey(text: 'テスト104', style: style, maxWidth: 100);
       expect(LayoutCache.get(newKey), isNotNull);
+    });
+
+    test('should update LRU order on get', () {
+      const style = HorizontalTextStyle();
+      final value = LayoutCacheValue(layouts: [], size: Size.zero);
+
+      // Add entries
+      for (int i = 0; i < 100; i++) {
+        final key = LayoutCacheKey(text: 'テスト$i', style: style, maxWidth: 100);
+        LayoutCache.put(key, value);
+      }
+
+      // Access first entry to move it to end
+      const firstKey = LayoutCacheKey(text: 'テスト0', style: style, maxWidth: 100);
+      LayoutCache.get(firstKey);
+
+      // Add new entries to trigger eviction
+      for (int i = 100; i < 105; i++) {
+        final key = LayoutCacheKey(text: 'テスト$i', style: style, maxWidth: 100);
+        LayoutCache.put(key, value);
+      }
+
+      // First entry should still exist (was recently accessed)
+      expect(LayoutCache.get(firstKey), isNotNull);
+
+      // Entry 1 should be evicted (wasn't accessed)
+      const secondKey = LayoutCacheKey(text: 'テスト1', style: style, maxWidth: 100);
+      expect(LayoutCache.get(secondKey), isNull);
     });
   });
 }

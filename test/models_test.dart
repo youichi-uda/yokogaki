@@ -131,6 +131,61 @@ void main() {
       expect(copied.firstLineIndent, 1);
       expect(style.indent, 1); // Original should be unchanged
     });
+
+    test('copyWith should preserve unmodified values', () {
+      const style = HorizontalTextStyle(
+        lineSpacing: 5.0,
+        characterSpacing: 2.0,
+        indent: 1,
+        firstLineIndent: 2,
+      );
+      final copied = style.copyWith(indent: 3);
+
+      expect(copied.lineSpacing, 5.0);
+      expect(copied.characterSpacing, 2.0);
+      expect(copied.indent, 3);
+      expect(copied.firstLineIndent, 2);
+    });
+
+    test('copyWith should handle all properties', () {
+      const style = HorizontalTextStyle();
+      final copied = style.copyWith(
+        lineSpacing: 10.0,
+        characterSpacing: 5.0,
+        adjustYakumono: false,
+        enableKinsoku: false,
+        enableHalfWidthYakumono: false,
+        enableGyotoIndent: false,
+        enableKerning: false,
+        alignment: TextAlignment.end,
+        indent: 2,
+        firstLineIndent: 1,
+      );
+
+      expect(copied.lineSpacing, 10.0);
+      expect(copied.characterSpacing, 5.0);
+      expect(copied.adjustYakumono, false);
+      expect(copied.enableKinsoku, false);
+      expect(copied.enableHalfWidthYakumono, false);
+      expect(copied.enableGyotoIndent, false);
+      expect(copied.enableKerning, false);
+      expect(copied.alignment, TextAlignment.end);
+      expect(copied.indent, 2);
+      expect(copied.firstLineIndent, 1);
+    });
+
+    test('indent and firstLineIndent should be independent', () {
+      const style1 = HorizontalTextStyle(indent: 2, firstLineIndent: 0);
+      const style2 = HorizontalTextStyle(indent: 0, firstLineIndent: 2);
+      const style3 = HorizontalTextStyle(indent: 2, firstLineIndent: 2);
+
+      expect(style1.indent, 2);
+      expect(style1.firstLineIndent, 0);
+      expect(style2.indent, 0);
+      expect(style2.firstLineIndent, 2);
+      expect(style3.indent, 2);
+      expect(style3.firstLineIndent, 2);
+    });
   });
 
   group('HorizontalTextSpan', () {

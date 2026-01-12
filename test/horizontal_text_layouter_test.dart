@@ -105,6 +105,91 @@ void main() {
         expect(layouts[1].position.dx, 0);
       });
 
+      test('should apply both indent and firstLineIndent to first line', () {
+        const style = HorizontalTextStyle(
+          baseStyle: TextStyle(fontSize: 16),
+          indent: 1,
+          firstLineIndent: 2,
+        );
+        final layouts = HorizontalTextLayouter.layout(
+          text: 'あ\nい',
+          style: style,
+          useCache: false,
+        );
+
+        // First line: indent + firstLineIndent = 1 + 2 = 3 characters
+        expect(layouts[0].position.dx, 48); // 3 * fontSize
+
+        // Second line: only indent = 1 character
+        expect(layouts[1].position.dx, 16); // 1 * fontSize
+      });
+
+      test('firstLineIndent should not affect lines after line wrap', () {
+        const style = HorizontalTextStyle(
+          baseStyle: TextStyle(fontSize: 16),
+          firstLineIndent: 2,
+          enableKinsoku: false, // Disable kinsoku for predictable wrapping
+        );
+        // With firstLineIndent=2, first line starts at X=32
+        // maxWidth=48 means only ~1 character fits (48-32=16)
+        final layouts = HorizontalTextLayouter.layout(
+          text: 'あいう',
+          style: style,
+          maxWidth: 48,
+          useCache: false,
+        );
+
+        // First line has firstLineIndent = 2 * 16 = 32
+        expect(layouts[0].position.dx, 32);
+
+        // Find characters on second line
+        final firstLineY = layouts[0].position.dy;
+        final secondLineLayouts = layouts.where(
+          (l) => l.position.dy > firstLineY,
+        ).toList();
+
+        // Second line should NOT have firstLineIndent (should be less than first line)
+        if (secondLineLayouts.isNotEmpty) {
+          expect(secondLineLayouts[0].position.dx, lessThan(32));
+        }
+      });
+
+      test('indent should apply to all lines including wrapped ones', () {
+        const style = HorizontalTextStyle(
+          baseStyle: TextStyle(fontSize: 16),
+          indent: 1,
+          enableKinsoku: false,
+        );
+        final layouts = HorizontalTextLayouter.layout(
+          text: 'あい',
+          style: style,
+          maxWidth: 32, // Allow only 1 char per line with indent
+          useCache: false,
+        );
+
+        // First line: starts at indent = 16
+        expect(layouts[0].position.dx, 16);
+
+        // Second line: also starts at indent = 16 (same indent as first line)
+        // Both lines should have the same starting X position
+        expect(layouts[1].position.dx, layouts[0].position.dx);
+      });
+
+      test('should apply characterSpacing between characters', () {
+        const style = HorizontalTextStyle(
+          baseStyle: TextStyle(fontSize: 16),
+          characterSpacing: 4,
+        );
+        final layouts = HorizontalTextLayouter.layout(
+          text: 'あい',
+          style: style,
+          useCache: false,
+        );
+
+        // Second character should be at fontSize + characterSpacing
+        expect(layouts[1].position.dx, 20); // 16 + 4
+      });
+
       test('should skip newline characters', () {
         const style = HorizontalTextStyle(
           baseStyle: TextStyle(fontSize: 16),
