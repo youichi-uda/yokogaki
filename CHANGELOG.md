@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.2] - 2026-01-12
+
+### Fixed
+- **LayoutCache bug**: Cache now correctly includes `indent`, `firstLineIndent`, `rubyStyle`, `kentenStyle`, and `warichuStyle` in key comparison
+- **HorizontalRichText**: Added missing `extraHeight` calculation for ruby and kenten annotations
+- **SelectionAreaHorizontalText**: Use `listEquals` for annotation list comparison to avoid unnecessary repaints
+
+### Changed
+- Extract duplicate `_getCharacterWidth` function to shared `TextMetrics` utility class
+- Optimize `DecorationRenderer` to measure text height once per layout call instead of per decoration
+- Remove unused `fontSize` parameter from `_drawCharacter` methods in painters
+
+### Added
+- Comprehensive unit tests (64 tests covering models, cache, layouter, and widgets)
+- New `TextMetrics` utility class for shared text measurement functions
+
 ## [0.10.1] - 2026-01-11
 
 ### Added
