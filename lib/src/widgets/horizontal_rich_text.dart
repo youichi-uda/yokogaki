@@ -83,11 +83,35 @@ class HorizontalRichText extends StatelessWidget {
     );
 
     // Calculate the size needed for the text
-    final size = HorizontalTextLayouter.calculateSize(
+    final baseSize = HorizontalTextLayouter.calculateSize(
       text: combinedText.toString(),
       style: effectiveStyle,
       maxWidth: maxWidth,
     );
+
+    // Add extra height for ruby and kenten
+    final fontSize = effectiveStyle.baseStyle.fontSize ?? 16.0;
+    double extraHeight = 0.0;
+
+    if (allRuby.isNotEmpty) {
+      final rubyFontSize = effectiveStyle.rubyStyle?.fontSize ?? (fontSize * 0.5);
+      extraHeight = rubyFontSize + 4.0; // ruby height + gap
+    }
+
+    if (allKenten.isNotEmpty) {
+      final kentenSize = fontSize * 0.3;
+      final kentenHeight = kentenSize + 8.0; // kenten size + gap
+      extraHeight = extraHeight > kentenHeight ? extraHeight : kentenHeight;
+    }
+
+    // If both ruby and kenten exist, use the larger one
+    if (allRuby.isNotEmpty && allKenten.isNotEmpty) {
+      final rubyFontSize = effectiveStyle.rubyStyle?.fontSize ?? (fontSize * 0.5);
+      final kentenSize = fontSize * 0.3;
+      extraHeight = rubyFontSize + kentenSize + 10.0; // both + gaps
+    }
+
+    final size = Size(baseSize.width, baseSize.height + extraHeight);
 
     return CustomPaint(
       size: size,

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../models/horizontal_text_style.dart';
@@ -171,7 +172,7 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   List<RubyText> _rubyList;
   List<RubyText> get rubyList => _rubyList;
   set rubyList(List<RubyText> value) {
-    if (_rubyList == value) return;
+    if (listEquals(_rubyList, value)) return;
     _rubyList = value;
     markNeedsPaint();
   }
@@ -179,7 +180,7 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   List<Kenten> _kentenList;
   List<Kenten> get kentenList => _kentenList;
   set kentenList(List<Kenten> value) {
-    if (_kentenList == value) return;
+    if (listEquals(_kentenList, value)) return;
     _kentenList = value;
     markNeedsPaint();
   }
@@ -187,7 +188,7 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   List<Warichu> _warichuList;
   List<Warichu> get warichuList => _warichuList;
   set warichuList(List<Warichu> value) {
-    if (_warichuList == value) return;
+    if (listEquals(_warichuList, value)) return;
     _warichuList = value;
     markNeedsPaint();
   }
@@ -195,7 +196,7 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   List<TextDecorationAnnotation> _decorationList;
   List<TextDecorationAnnotation> get decorationList => _decorationList;
   set decorationList(List<TextDecorationAnnotation> value) {
-    if (_decorationList == value) return;
+    if (listEquals(_decorationList, value)) return;
     _decorationList = value;
     markNeedsPaint();
   }
@@ -203,7 +204,7 @@ class RenderSelectionAreaHorizontalText extends RenderBox with Selectable, Selec
   List<Gaiji> _gaijiList;
   List<Gaiji> get gaijiList => _gaijiList;
   set gaijiList(List<Gaiji> value) {
-    if (_gaijiList == value) return;
+    if (listEquals(_gaijiList, value)) return;
     _gaijiList = value;
     markNeedsPaint();
   }

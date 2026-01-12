@@ -92,7 +92,7 @@ class HorizontalTextPainter extends CustomPainter {
     // Draw each character (skip gaiji characters)
     for (final layout in layouts) {
       if (!gaijiIndices.contains(layout.textIndex)) {
-        _drawCharacter(canvas, layout, fontSize);
+        _drawCharacter(canvas, layout);
       }
     }
 
@@ -136,7 +136,7 @@ class HorizontalTextPainter extends CustomPainter {
     textDirection: TextDirection.ltr,
   );
 
-  void _drawCharacter(Canvas canvas, CharacterLayout layout, double fontSize) {
+  void _drawCharacter(Canvas canvas, CharacterLayout layout) {
     _textPainter.text = TextSpan(
       text: layout.character,
       style: style.baseStyle,

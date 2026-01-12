@@ -74,7 +74,7 @@ class HorizontalRichTextPainter extends CustomPainter {
     for (final layout in layouts) {
       final textIndex = layout.textIndex;
       final charStyle = _getStyleForIndex(textIndex);
-      _drawCharacter(canvas, layout, fontSize, charStyle);
+      _drawCharacter(canvas, layout, charStyle);
     }
 
     // Draw ruby text
@@ -114,7 +114,6 @@ class HorizontalRichTextPainter extends CustomPainter {
   void _drawCharacter(
     Canvas canvas,
     CharacterLayout layout,
-    double fontSize,
     TextStyle charStyle,
   ) {
     _textPainter.text = TextSpan(

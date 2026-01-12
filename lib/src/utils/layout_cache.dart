@@ -43,7 +43,23 @@ class LayoutCacheKey {
         a.enableHalfWidthYakumono == b.enableHalfWidthYakumono &&
         a.enableGyotoIndent == b.enableGyotoIndent &&
         a.enableKerning == b.enableKerning &&
-        a.alignment == b.alignment;
+        a.alignment == b.alignment &&
+        a.indent == b.indent &&
+        a.firstLineIndent == b.firstLineIndent &&
+        _textStylesEqual(a.rubyStyle, b.rubyStyle) &&
+        _textStylesEqual(a.kentenStyle, b.kentenStyle) &&
+        _textStylesEqual(a.warichuStyle, b.warichuStyle);
+  }
+
+  /// Compare two nullable TextStyle instances for equality
+  bool _textStylesEqual(TextStyle? a, TextStyle? b) {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    return a.fontSize == b.fontSize &&
+        a.color == b.color &&
+        a.fontFamily == b.fontFamily &&
+        a.fontWeight == b.fontWeight &&
+        a.fontStyle == b.fontStyle;
   }
 
   /// Calculate hash code for HorizontalTextStyle
@@ -60,6 +76,23 @@ class LayoutCacheKey {
       style.enableGyotoIndent,
       style.enableKerning,
       style.alignment,
+      style.indent,
+      style.firstLineIndent,
+      _textStyleHashCode(style.rubyStyle),
+      _textStyleHashCode(style.kentenStyle),
+      _textStyleHashCode(style.warichuStyle),
+    );
+  }
+
+  /// Calculate hash code for nullable TextStyle
+  int _textStyleHashCode(TextStyle? style) {
+    if (style == null) return 0;
+    return Object.hash(
+      style.fontSize,
+      style.color,
+      style.fontFamily,
+      style.fontWeight,
+      style.fontStyle,
     );
   }
 }

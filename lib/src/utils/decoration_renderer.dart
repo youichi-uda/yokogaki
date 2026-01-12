@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/text_decoration.dart';
 import '../models/horizontal_text_style.dart';
 import '../rendering/horizontal_text_layouter.dart';
+import 'text_metrics.dart';
 
 /// Layout information for a text decoration
 class DecorationLayout {
@@ -46,6 +47,9 @@ class DecorationRenderer {
     final fontSize = style.baseStyle.fontSize ?? 16.0;
     final defaultColor = style.baseStyle.color ?? Colors.black;
 
+    // Measure text height once outside the loop
+    final textHeight = TextMetrics.getTextHeight(style.baseStyle);
+
     for (final decoration in decorationList) {
       // Find all character layouts in this decoration range
       final charLayouts = <CharacterLayout>[];
@@ -72,8 +76,8 @@ class DecorationRenderer {
         final firstChar = lineChars.first;
         final lastChar = lineChars.last;
 
-        // Calculate last character width
-        final lastCharWidth = fontSize; // Simplified
+        // Calculate last character width using actual measurement
+        final lastCharWidth = TextMetrics.getCharacterWidth(lastChar.character, style);
 
         final startX = firstChar.position.dx;
         final endX = lastChar.position.dx + lastCharWidth;
@@ -85,14 +89,6 @@ class DecorationRenderer {
             decoration.type == TextDecorationLineType.dottedOverline;
 
         final thickness = decoration.thickness ?? (fontSize * 0.05).clamp(1.0, 3.0);
-
-        // Measure actual text height
-        final textPainter = TextPainter(
-          text: TextSpan(text: 'あ', style: style.baseStyle),
-          textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        final textHeight = textPainter.height;
 
         double decorationY;
         if (isOverline) {

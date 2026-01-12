@@ -90,7 +90,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
 
     // Draw each character
     for (final layout in layouts) {
-      _drawCharacter(canvas, layout, fontSize);
+      _drawCharacter(canvas, layout);
     }
 
     // Draw ruby text
@@ -251,7 +251,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
     textDirection: TextDirection.ltr,
   );
 
-  void _drawCharacter(Canvas canvas, CharacterLayout layout, double fontSize) {
+  void _drawCharacter(Canvas canvas, CharacterLayout layout) {
     _textPainter.text = TextSpan(
       text: layout.character,
       style: style.baseStyle,

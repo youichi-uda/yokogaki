@@ -1,33 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:kinsoku/kinsoku.dart';
 import '../models/horizontal_text_style.dart';
 import '../models/ruby_text.dart';
 import '../models/kenten.dart';
 import '../models/text_decoration.dart';
 import '../rendering/horizontal_text_layouter.dart';
-
-/// Get actual character width
-double _getCharacterWidth(String character, HorizontalTextStyle style) {
-  final fontSize = style.baseStyle.fontSize ?? 16.0;
-
-  // Check half-width yakumono
-  if (YakumonoAdjuster.isHalfWidthYakumono(character) && style.enableHalfWidthYakumono) {
-    return fontSize * 0.5;
-  }
-
-  // For ASCII characters, measure actual width
-  if (character.codeUnitAt(0) < 128) {
-    final textPainter = TextPainter(
-      text: TextSpan(text: character, style: style.baseStyle),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    return textPainter.width;
-  }
-
-  // Default to full width
-  return fontSize;
-}
+import 'text_metrics.dart';
 
 /// Layout information for ruby text
 class RubyLayout {
@@ -163,7 +140,7 @@ class RubyRenderer {
         final baseX = firstChar.position.dx;
 
         // Calculate last character width using actual measurement
-        final lastCharWidth = _getCharacterWidth(lastChar.character, style);
+        final lastCharWidth = TextMetrics.getCharacterWidth(lastChar.character, style);
 
         final baseTextWidth = (lastChar.position.dx - firstChar.position.dx) + lastCharWidth;
 
