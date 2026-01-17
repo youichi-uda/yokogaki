@@ -69,6 +69,50 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 32),
             const Text(
+              'Character Spacing Test (字間テスト)',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Text('characterSpacing: 0', style: TextStyle(color: Colors.grey)),
+            Container(
+              color: Colors.yellow.withValues(alpha: 0.3),
+              child: HorizontalText(
+                text: 'あいうえお',
+                style: HorizontalTextStyle(
+                  baseStyle: const TextStyle(fontSize: 24),
+                  characterSpacing: 0,
+                ),
+                showGrid: true,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text('characterSpacing: 8', style: TextStyle(color: Colors.grey)),
+            Container(
+              color: Colors.yellow.withValues(alpha: 0.3),
+              child: HorizontalText(
+                text: 'あいうえお',
+                style: HorizontalTextStyle(
+                  baseStyle: const TextStyle(fontSize: 24),
+                  characterSpacing: 8,
+                ),
+                showGrid: true,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text('characterSpacing: 16', style: TextStyle(color: Colors.grey)),
+            Container(
+              color: Colors.yellow.withValues(alpha: 0.3),
+              child: HorizontalText(
+                text: 'あいうえお',
+                style: HorizontalTextStyle(
+                  baseStyle: const TextStyle(fontSize: 24),
+                  characterSpacing: 16,
+                ),
+                showGrid: true,
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
               'With Line Breaking (maxWidth: 300)',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
