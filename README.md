@@ -124,7 +124,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  yokogaki: ^0.10.1
+  yokogaki: ^0.10.3
 ```
 
 Then run:
@@ -375,6 +375,28 @@ SelectionArea(
 
 This allows seamless text selection that spans across multiple selectable widgets.
 
+### Long Press Selectable Text
+
+For reading apps where drag gestures should scroll content rather than select text, use `LongPressSelectableHorizontalText`. Selection only starts after a long press (similar to Android Chrome):
+
+```dart
+LongPressSelectableHorizontalText(
+  text: 'これは長押しで選択可能な横書きテキストです。',
+  style: HorizontalTextStyle(
+    baseStyle: TextStyle(fontSize: 24),
+  ),
+  maxWidth: 350,
+  // Optional: customize long press duration (default: 500ms)
+  longPressDuration: Duration(milliseconds: 500),
+)
+```
+
+Features:
+- Long press to start selection (word-by-word using TinySegmenter)
+- Drag to extend selection
+- Copy menu with haptic feedback
+- Tap to dismiss selection
+
 ### Debug Grid
 
 ```dart
@@ -542,6 +564,7 @@ Performance improvements:
 - [x] Text decoration (underline/overline)
 - [x] Text alignment (地付き)
 - [x] Selection API integration (SelectionArea support)
+- [x] Long press selectable text (v0.10.3)
 
 All planned features are now complete!
 
