@@ -1,3 +1,4 @@
+import 'package:characters/characters.dart';
 import 'package:flutter/material.dart';
 import 'package:kinsoku/kinsoku.dart';
 import '../models/horizontal_text_style.dart';
@@ -72,8 +73,13 @@ class HorizontalTextLayouter {
     int lineStartIndex = 0;
     bool shouldBreakAfterCurrentChar = false; // Flag for burasage (hanging)
 
-    for (int i = 0; i < text.length; i++) {
-      final char = text[i];
+    // Use characters package for proper Unicode grapheme cluster iteration
+    // This correctly handles surrogate pairs (e.g., CJK Extension B characters)
+    final characters = text.characters;
+    int textIndex = 0;  // UTF-16 code unit index
+
+    for (final char in characters) {
+      final i = textIndex;  // For compatibility with existing code
 
       // Handle newline characters
       if (char == '\n') {
@@ -81,7 +87,8 @@ class HorizontalTextLayouter {
         // Subsequent lines only get indent, not firstLineIndent
         currentX = indentOffset;
         currentY += fontSize + style.lineSpacing;
-        lineStartIndex = i + 1;
+        lineStartIndex = i + char.length;
+        textIndex += char.length;
         continue;
       }
 
@@ -94,7 +101,7 @@ class HorizontalTextLayouter {
             shouldBreakAfterCurrentChar = true;
           } else {
             // Cannot hang - need to find proper break position
-            int breakPos = KinsokuProcessor.findBreakPosition(text.substring(lineStartIndex, i + 1), i - lineStartIndex);
+            int breakPos = KinsokuProcessor.findBreakPosition(text.substring(lineStartIndex, i + char.length), i - lineStartIndex);
             int actualBreakPos = lineStartIndex + breakPos;
 
             // If break position is before current position, need to move some characters to next line
@@ -109,12 +116,14 @@ class HorizontalTextLayouter {
               lineStartIndex = actualBreakPos;
 
               // Re-layout characters from actualBreakPos to i-1 on the new line
-              for (int j = actualBreakPos; j < i; j++) {
-                final reChar = text[j];
+              // Use characters iteration for proper surrogate pair handling
+              final remainingText = text.substring(actualBreakPos, i);
+              for (final reChar in remainingText.characters) {
+                final reCharIndex = actualBreakPos + remainingText.indexOf(reChar);
                 layouts.add(CharacterLayout(
                   character: reChar,
                   position: Offset(currentX, currentY),
-                  textIndex: j,
+                  textIndex: reCharIndex,
                 ));
                 double charWidth = YakumonoAdjuster.isHalfWidthYakumono(reChar) && style.enableHalfWidthYakumono
                     ? fontSize * 0.5
@@ -160,9 +169,12 @@ class HorizontalTextLayouter {
         // Subsequent lines only get indent, not firstLineIndent
         currentX = indentOffset;
         currentY += fontSize + style.lineSpacing;
-        lineStartIndex = i + 1;
+        lineStartIndex = i + char.length;
         shouldBreakAfterCurrentChar = false;
       }
+
+      // Update index for next iteration
+      textIndex += char.length;
     }
 
     // Apply line alignment (jizuki, tenzuki, center)

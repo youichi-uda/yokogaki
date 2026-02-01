@@ -96,10 +96,9 @@ class WarichuRenderer {
     final warichuColor = baseColor.withValues(alpha: 0.8); // Slightly lighter
 
     for (final layout in warichuLayouts) {
-      final warichuStyle = TextStyle(
+      final warichuStyle = style.baseStyle.copyWith(
         fontSize: layout.fontSize,
         color: warichuColor,
-        fontFamily: style.baseStyle.fontFamily,
       );
 
       // Draw top line
