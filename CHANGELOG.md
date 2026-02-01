@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.7] - 2026-02-02
+
+### Fixed
+- **Ruby and Kenten vertical positioning**: Fix annotations being positioned too far from base text
+  - Root cause: mismatch between `HorizontalTextLayouter` using `fontSize` for positioning vs `TextPainter` using baseline-based rendering
+  - Use `computeDistanceToActualBaseline(TextBaseline.ideographic)` for accurate baseline measurement
+  - Ruby now correctly positioned with consistent gap (fontSize/4 + 1px) above base text
+  - Kenten marks now use the same baseline-aware positioning logic
+
+## [0.10.6] - 2026-02-01
+
+### Fixed
+- **Ruby vertical position**: Fix ruby text being positioned incorrectly relative to base text
+  - Changed formula from `lineY - rubyFontSize + 2.0` to `lineY - rubyFontSize - 2.0`
+  - Previous formula caused ruby to overlap with text; now correctly positioned 2px above base text
+
 ## [0.10.5] - 2026-02-01
 
 ### Fixed

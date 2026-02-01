@@ -81,6 +81,17 @@ class RubyRenderer {
     final rubyFontSize = style.rubyStyle?.fontSize ?? (baseFontSize * 0.5);
     final kentenSize = baseFontSize * 0.3; // Same as in KentenRenderer
 
+    // Measure actual baseline position to account for line height and font metrics
+    // HorizontalTextLayouter uses fontSize for positioning, but TextPainter
+    // renders based on baseline, causing a mismatch.
+    _textPainter.text = TextSpan(text: 'あ', style: style.baseStyle);
+    _textPainter.layout();
+    // computeDistanceToActualBaseline returns distance from top of text box to baseline
+    // For ideographic text, baseline is at the bottom of characters
+    // So visual top of character = baseline - fontSize
+    final baseline = _textPainter.computeDistanceToActualBaseline(TextBaseline.ideographic);
+    final textTopOffset = baseline - baseFontSize;
+
     for (final ruby in rubyList) {
       // Find all character layouts in this ruby range
       final baseLayouts = <CharacterLayout>[];
@@ -179,17 +190,21 @@ class RubyRenderer {
         }
 
         // Place ruby above the base text
-        // If kenten marks or overline exist, place ruby above them
+        // textTopOffset accounts for the difference between layout position (lineY)
+        // and actual visual top of the text (based on baseline positioning)
+        // The visual top of text is at: lineY + textTopOffset
+        // Gap = baseFontSize / 4 + 1.0 (same as basic case)
+        final rubyGap = baseFontSize / 4 + 1.0;
         double rubyY;
         if (hasKentenInLine) {
-          // Ruby should be above kenten: lineY - kentenSize + 8 (kenten gap) - rubyFontSize - 2 (close)
-          rubyY = lineY - kentenSize + 8.0 - rubyFontSize - 2.0;
+          // Ruby above kenten (kenten is above text)
+          rubyY = lineY + textTopOffset - kentenSize - rubyGap - rubyFontSize - rubyGap;
         } else if (hasOverlineInLine) {
-          // Ruby should be above overline (same adjustment as kenten)
-          rubyY = lineY - kentenSize + 8.0 - rubyFontSize - 2.0;
+          // Ruby above overline
+          rubyY = lineY + textTopOffset - kentenSize - rubyGap - rubyFontSize - rubyGap;
         } else {
-          // Ruby directly above text (closer to text)
-          rubyY = lineY - rubyFontSize + 2.0; // -2px gap (closer)
+          // Ruby directly above text with small gap
+          rubyY = lineY + textTopOffset - rubyFontSize - rubyGap;
         }
 
         layouts.add(RubyLayout(

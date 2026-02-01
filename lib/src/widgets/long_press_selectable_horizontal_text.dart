@@ -11,6 +11,9 @@ import '../models/gaiji.dart';
 import '../rendering/horizontal_text_layouter.dart';
 import '../rendering/horizontal_text_painter.dart';
 
+/// Enum to track which handle is being dragged
+enum _DragTarget { none, startHandle, endHandle }
+
 /// A horizontal text widget that only starts selection on long press.
 ///
 /// Unlike [SelectionAreaHorizontalText] which works with Flutter's SelectionArea,
@@ -82,6 +85,9 @@ class _LongPressSelectableHorizontalTextState
   int _selectionStart = -1;
   int _selectionEnd = -1;
   bool _isSelecting = false;
+
+  // Handle drag state
+  _DragTarget _dragTarget = _DragTarget.none;
 
   // Layout cache
   List<CharacterLayout>? _characterLayouts;
@@ -161,9 +167,10 @@ class _LongPressSelectableHorizontalTextState
       maxY = math.max(maxY, layout.position.dy + textHeight);
     }
 
+    const handleSpace = 24.0; // handleRadius * 2 + margin
     _computedSize = Size(
       effectiveMaxWidth > 0 ? math.min(maxX, effectiveMaxWidth) : maxX,
-      maxY,
+      maxY + handleSpace,
     );
   }
 
@@ -329,36 +336,195 @@ class _LongPressSelectableHorizontalTextState
     _clearSelection();
   }
 
+  /// Get handle positions for overlay
+  ({Offset start, Offset end})? _getHandlePositions() {
+    if (_selectionStart < 0 || _selectionEnd <= _selectionStart) return null;
+    if (_characterLayouts == null) return null;
+
+    // Get actual text height
+    _textPainter.text = TextSpan(text: 'あ', style: widget.style.baseStyle);
+    _textPainter.layout();
+    final textHeight = _textPainter.height;
+
+    const handleRadius = 8.0;
+
+    CharacterLayout? startLayout;
+    CharacterLayout? endLayout;
+    final start = math.min(_selectionStart, _selectionEnd);
+    final end = math.max(_selectionStart, _selectionEnd);
+
+    for (final layout in _characterLayouts!) {
+      if (layout.textIndex == start) startLayout = layout;
+      if (layout.textIndex == end - 1) endLayout = layout;
+    }
+
+    if (startLayout == null || endLayout == null) return null;
+
+    // Start handle: at bottom-left of first selected character
+    final startPos = Offset(
+      startLayout.position.dx - handleRadius,
+      startLayout.position.dy + textHeight,
+    );
+
+    // End handle: at bottom-right of last selected character
+    _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
+    _textPainter.layout();
+    final endCharWidth = _textPainter.width;
+
+    final endPos = Offset(
+      endLayout.position.dx + endCharWidth - handleRadius,
+      endLayout.position.dy + textHeight,
+    );
+
+    return (start: startPos, end: endPos);
+  }
+
+  void _onHandleDragStart(_DragTarget target) {
+    _hideContextMenu();
+    setState(() {
+      _dragTarget = target;
+    });
+    HapticFeedback.selectionClick();
+  }
+
+  void _onHandleDragUpdate(DragUpdateDetails details, _DragTarget target) {
+    if (_dragTarget != target) return;
+
+    final renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final localPosition = renderBox.globalToLocal(details.globalPosition);
+    final charIndex = _getCharacterIndexAt(localPosition);
+    if (charIndex < 0) return;
+
+    setState(() {
+      if (target == _DragTarget.startHandle) {
+        if (charIndex < _selectionEnd) {
+          _selectionStart = charIndex;
+        }
+      } else if (target == _DragTarget.endHandle) {
+        final newEnd = (charIndex + 1).clamp(0, widget.text.length);
+        if (newEnd > _selectionStart) {
+          _selectionEnd = newEnd;
+        }
+      }
+    });
+  }
+
+  void _onHandleDragEnd(_DragTarget target) {
+    setState(() {
+      _dragTarget = _DragTarget.none;
+    });
+
+    // Show context menu
+    if (_selectionStart >= 0 && _selectionEnd > _selectionStart) {
+      final renderBox = context.findRenderObject() as RenderBox?;
+      if (renderBox != null && _characterLayouts != null) {
+        final end = math.max(_selectionStart, _selectionEnd);
+        CharacterLayout? endLayout;
+        for (final layout in _characterLayouts!) {
+          if (layout.textIndex == end - 1) {
+            endLayout = layout;
+            break;
+          }
+        }
+        if (endLayout != null) {
+          _textPainter.text = TextSpan(text: 'あ', style: widget.style.baseStyle);
+          _textPainter.layout();
+          final textHeight = _textPainter.height;
+
+          _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
+          _textPainter.layout();
+          final charWidth = _textPainter.width;
+
+          final localPos = Offset(
+            endLayout.position.dx + charWidth,
+            endLayout.position.dy + textHeight,
+          );
+          final globalPos = renderBox.localToGlobal(localPos);
+          _showContextMenu(globalPos);
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         _ensureLayout(constraints);
 
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: _handleTap,
-          onLongPressStart: _handleLongPressStart,
-          onLongPressMoveUpdate: _handleLongPressMoveUpdate,
-          onLongPressEnd: _handleLongPressEnd,
-          child: CustomPaint(
-            size: _computedSize ?? Size.zero,
-            painter: _LongPressSelectableHorizontalTextPainter(
-              text: widget.text,
-              style: widget.style,
-              maxWidth: widget.maxWidth,
-              rubyList: widget.rubyList,
-              kentenList: widget.kentenList,
-              warichuList: widget.warichuList,
-              decorationList: widget.decorationList,
-              gaijiList: widget.gaijiList,
-              selectionStart: _selectionStart,
-              selectionEnd: _selectionEnd,
-              selectionColor: widget.selectionColor ??
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-              characterLayouts: _characterLayouts,
+        final hasSelection = _selectionStart >= 0 && _selectionEnd > _selectionStart;
+        final handlePositions = hasSelection ? _getHandlePositions() : null;
+        final handleColor = Theme.of(context).colorScheme.primary;
+        const handleSize = 32.0; // Touch target size
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // Main text with gesture detection
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _handleTap,
+              onLongPressStart: _handleLongPressStart,
+              onLongPressMoveUpdate: _handleLongPressMoveUpdate,
+              onLongPressEnd: _handleLongPressEnd,
+              child: CustomPaint(
+                size: _computedSize ?? Size.zero,
+                painter: _LongPressSelectableHorizontalTextPainter(
+                  text: widget.text,
+                  style: widget.style,
+                  maxWidth: widget.maxWidth,
+                  rubyList: widget.rubyList,
+                  kentenList: widget.kentenList,
+                  warichuList: widget.warichuList,
+                  decorationList: widget.decorationList,
+                  gaijiList: widget.gaijiList,
+                  selectionStart: _selectionStart,
+                  selectionEnd: _selectionEnd,
+                  selectionColor: widget.selectionColor ??
+                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+                  characterLayouts: _characterLayouts,
+                  showHandles: hasSelection,
+                  handleColor: handleColor,
+                ),
+              ),
             ),
-          ),
+            // Start handle overlay
+            if (handlePositions != null)
+              Positioned(
+                left: handlePositions.start.dx,
+                top: handlePositions.start.dy,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onPanStart: (_) => _onHandleDragStart(_DragTarget.startHandle),
+                  onPanUpdate: (details) => _onHandleDragUpdate(details, _DragTarget.startHandle),
+                  onPanEnd: (_) => _onHandleDragEnd(_DragTarget.startHandle),
+                  child: Container(
+                    width: handleSize,
+                    height: handleSize,
+                    color: Colors.transparent,
+                  ),
+                ),
+              ),
+            // End handle overlay
+            if (handlePositions != null)
+              Positioned(
+                left: handlePositions.end.dx,
+                top: handlePositions.end.dy,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onPanStart: (_) => _onHandleDragStart(_DragTarget.endHandle),
+                  onPanUpdate: (details) => _onHandleDragUpdate(details, _DragTarget.endHandle),
+                  onPanEnd: (_) => _onHandleDragEnd(_DragTarget.endHandle),
+                  child: Container(
+                    width: handleSize,
+                    height: handleSize,
+                    color: Colors.transparent,
+                  ),
+                ),
+              ),
+          ],
         );
       },
     );
@@ -387,6 +553,8 @@ class _LongPressSelectableHorizontalTextPainter extends CustomPainter {
   final int selectionEnd;
   final Color selectionColor;
   final List<CharacterLayout>? characterLayouts;
+  final bool showHandles;
+  final Color handleColor;
 
   // Reusable TextPainter
   static final TextPainter _textPainter = TextPainter(
@@ -406,6 +574,8 @@ class _LongPressSelectableHorizontalTextPainter extends CustomPainter {
     required this.selectionEnd,
     required this.selectionColor,
     required this.characterLayouts,
+    required this.showHandles,
+    required this.handleColor,
   });
 
   @override
@@ -415,6 +585,11 @@ class _LongPressSelectableHorizontalTextPainter extends CustomPainter {
         selectionEnd > selectionStart &&
         characterLayouts != null) {
       _paintSelection(canvas, size);
+    }
+
+    // Draw handles if selection exists
+    if (showHandles && selectionStart >= 0 && selectionEnd > selectionStart && characterLayouts != null) {
+      _paintHandles(canvas, size);
     }
 
     // Draw text using HorizontalTextPainter
@@ -459,13 +634,98 @@ class _LongPressSelectableHorizontalTextPainter extends CustomPainter {
     }
   }
 
+  void _paintHandles(Canvas canvas, Size size) {
+    // Get actual text height
+    _textPainter.text = TextSpan(text: 'あ', style: style.baseStyle);
+    _textPainter.layout();
+    final textHeight = _textPainter.height;
+
+    const handleRadius = 8.0;
+
+    // Find start and end character positions
+    CharacterLayout? startLayout;
+    CharacterLayout? endLayout;
+    final start = math.min(selectionStart, selectionEnd);
+    final end = math.max(selectionStart, selectionEnd);
+
+    for (final layout in characterLayouts!) {
+      if (layout.textIndex == start) startLayout = layout;
+      if (layout.textIndex == end - 1) endLayout = layout;
+    }
+
+    if (startLayout == null || endLayout == null) return;
+
+    // Handle paint
+    final handlePaint = Paint()
+      ..color = handleColor
+      ..style = PaintingStyle.fill;
+    final handleStrokePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    final linePaint = Paint()
+      ..color = handleColor
+      ..strokeWidth = 2.0;
+
+    // Start handle: at bottom-left of first selected character
+    // Vertical line down + circle at bottom
+    final startX = startLayout.position.dx;
+    final startY = startLayout.position.dy + textHeight;
+
+    // Vertical line down
+    canvas.drawLine(
+      Offset(startX, startY),
+      Offset(startX, startY + handleRadius * 2),
+      linePaint,
+    );
+    // Circle at bottom
+    canvas.drawCircle(
+      Offset(startX, startY + handleRadius * 2 + handleRadius),
+      handleRadius,
+      handlePaint,
+    );
+    canvas.drawCircle(
+      Offset(startX, startY + handleRadius * 2 + handleRadius),
+      handleRadius,
+      handleStrokePaint,
+    );
+
+    // End handle: at bottom-right of last selected character
+    _textPainter.text = TextSpan(text: endLayout.character, style: style.baseStyle);
+    _textPainter.layout();
+    final endCharWidth = _textPainter.width;
+
+    final endX = endLayout.position.dx + endCharWidth;
+    final endY = endLayout.position.dy + textHeight;
+
+    // Vertical line down
+    canvas.drawLine(
+      Offset(endX, endY),
+      Offset(endX, endY + handleRadius * 2),
+      linePaint,
+    );
+    // Circle at bottom
+    canvas.drawCircle(
+      Offset(endX, endY + handleRadius * 2 + handleRadius),
+      handleRadius,
+      handlePaint,
+    );
+    canvas.drawCircle(
+      Offset(endX, endY + handleRadius * 2 + handleRadius),
+      handleRadius,
+      handleStrokePaint,
+    );
+  }
+
   @override
   bool shouldRepaint(_LongPressSelectableHorizontalTextPainter oldDelegate) {
     return text != oldDelegate.text ||
         style != oldDelegate.style ||
         selectionStart != oldDelegate.selectionStart ||
         selectionEnd != oldDelegate.selectionEnd ||
-        selectionColor != oldDelegate.selectionColor;
+        selectionColor != oldDelegate.selectionColor ||
+        showHandles != oldDelegate.showHandles ||
+        handleColor != oldDelegate.handleColor;
   }
 }
 

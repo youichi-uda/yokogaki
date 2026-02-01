@@ -23,8 +23,13 @@ class KentenLayout {
   });
 }
 
-/// Utility class for laying out and rendering kenten (emphasis marks)
+/// Kenten (emphasis marks) renderer for horizontal text
 class KentenRenderer {
+  // Reusable TextPainter for measuring text metrics
+  static final TextPainter _textPainter = TextPainter(
+    textDirection: TextDirection.ltr,
+  );
+
   /// Layout kenten marks based on character layouts
   static List<KentenLayout> layoutKenten(
     String text,
@@ -35,6 +40,12 @@ class KentenRenderer {
     final kentenLayouts = <KentenLayout>[];
     final fontSize = style.baseStyle.fontSize ?? 16.0;
     final kentenSize = fontSize * 0.3; // Kenten marks are typically 30% of base font size
+
+    // Measure actual baseline position to account for line height and font metrics
+    _textPainter.text = TextSpan(text: 'あ', style: style.baseStyle);
+    _textPainter.layout();
+    final baseline = _textPainter.computeDistanceToActualBaseline(TextBaseline.ideographic);
+    final textTopOffset = baseline - fontSize;
 
     for (final kenten in kentenList) {
       // Find character layouts for this kenten range
@@ -49,10 +60,10 @@ class KentenRenderer {
           final kentenGap = isAscii ? 2.0 : 8.0;
 
           // Position kenten mark above the character
-          // For horizontal text: above = Y - kentenSize - gap
+          // textTopOffset accounts for baseline positioning in TextPainter
           final kentenPosition = Offset(
             charLayout.position.dx + (charWidth - kentenSize) / 2, // Center horizontally based on actual width
-            charLayout.position.dy - kentenSize + kentenGap,
+            charLayout.position.dy + textTopOffset - kentenSize - fontSize / 4 - 1.0 + kentenGap,
           );
 
           kentenLayouts.add(KentenLayout(
