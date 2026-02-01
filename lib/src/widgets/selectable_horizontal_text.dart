@@ -114,9 +114,31 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
       maxWidth: widget.maxWidth,
     );
 
+    // Add extra height for ruby and kenten
+    final fontSize = effectiveStyle.baseStyle.fontSize ?? 16.0;
+    double extraHeight = 0.0;
+
+    if (widget.rubyList.isNotEmpty) {
+      final rubyFontSize = effectiveStyle.rubyStyle?.fontSize ?? (fontSize * 0.5);
+      extraHeight = rubyFontSize + 4.0; // ruby height + gap
+    }
+
+    if (widget.kentenList.isNotEmpty) {
+      final kentenSize = fontSize * 0.3;
+      final kentenHeight = kentenSize + 8.0; // kenten size + gap
+      extraHeight = extraHeight > kentenHeight ? extraHeight : kentenHeight;
+    }
+
+    // If both ruby and kenten exist, use the larger one
+    if (widget.rubyList.isNotEmpty && widget.kentenList.isNotEmpty) {
+      final rubyFontSize = effectiveStyle.rubyStyle?.fontSize ?? (fontSize * 0.5);
+      final kentenSize = fontSize * 0.3;
+      extraHeight = rubyFontSize + kentenSize + 10.0; // both + gaps
+    }
+
     // Add extra space for selection handles
     const handleExtraHeight = 12.0; // handleRadius * 2
-    final size = Size(baseSize.width, baseSize.height + handleExtraHeight);
+    final size = Size(baseSize.width, baseSize.height + extraHeight + handleExtraHeight);
 
     return Focus(
       focusNode: _focusNode,
@@ -181,6 +203,7 @@ class _SelectableHorizontalTextState extends State<SelectableHorizontalText> {
             onLayoutsCalculated: (layouts) {
               _layouts = layouts;
             },
+            topOffset: extraHeight,
           ),
         ),
       ),

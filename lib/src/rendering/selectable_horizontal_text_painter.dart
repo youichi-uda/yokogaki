@@ -24,6 +24,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
   final Color handleColor;
   final bool showHandles;
   final void Function(List<CharacterLayout>)? onLayoutsCalculated;
+  final double topOffset;
 
   SelectableHorizontalTextPainter({
     required this.text,
@@ -39,11 +40,17 @@ class SelectableHorizontalTextPainter extends CustomPainter {
     this.handleColor = const Color(0xFF2196F3),
     this.showHandles = true,
     this.onLayoutsCalculated,
+    this.topOffset = 0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (text.isEmpty) return;
+
+    // Apply top offset to leave room for ruby/kenten above the text
+    if (topOffset > 0) {
+      canvas.translate(0, topOffset);
+    }
 
     // Layout the text
     final layouts = HorizontalTextLayouter.layout(
@@ -307,6 +314,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
         selectionEnd != oldDelegate.selectionEnd ||
         selectionColor != oldDelegate.selectionColor ||
         handleColor != oldDelegate.handleColor ||
-        showHandles != oldDelegate.showHandles;
+        showHandles != oldDelegate.showHandles ||
+        topOffset != oldDelegate.topOffset;
   }
 }

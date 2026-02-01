@@ -45,6 +45,11 @@ class HorizontalTextPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (text.isEmpty) return;
 
+    // Apply top offset to leave room for ruby/kenten above the text
+    if (topOffset > 0) {
+      canvas.translate(0, topOffset);
+    }
+
     // Layout the text
     final layouts = HorizontalTextLayouter.layout(
       text: text,

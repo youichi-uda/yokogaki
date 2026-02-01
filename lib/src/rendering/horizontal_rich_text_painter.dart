@@ -19,6 +19,7 @@ class HorizontalRichTextPainter extends CustomPainter {
   final List<Kenten> kentenList;
   final List<Warichu> warichuList;
   final List<StyleRange> styleRanges;
+  final double topOffset;
 
   HorizontalRichTextPainter({
     required this.text,
@@ -29,11 +30,17 @@ class HorizontalRichTextPainter extends CustomPainter {
     this.kentenList = const [],
     this.warichuList = const [],
     this.styleRanges = const [],
+    this.topOffset = 0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (text.isEmpty) return;
+
+    // Apply top offset to leave room for ruby/kenten above the text
+    if (topOffset > 0) {
+      canvas.translate(0, topOffset);
+    }
 
     // Layout the text
     final layouts = HorizontalTextLayouter.layout(
@@ -167,6 +174,7 @@ class HorizontalRichTextPainter extends CustomPainter {
         rubyList != oldDelegate.rubyList ||
         kentenList != oldDelegate.kentenList ||
         warichuList != oldDelegate.warichuList ||
-        styleRanges != oldDelegate.styleRanges;
+        styleRanges != oldDelegate.styleRanges ||
+        topOffset != oldDelegate.topOffset;
   }
 }

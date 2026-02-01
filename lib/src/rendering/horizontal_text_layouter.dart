@@ -1,4 +1,3 @@
-import 'package:characters/characters.dart';
 import 'package:flutter/material.dart';
 import 'package:kinsoku/kinsoku.dart';
 import '../models/horizontal_text_style.dart';

@@ -124,6 +124,7 @@ class HorizontalRichText extends StatelessWidget {
         kentenList: allKenten,
         warichuList: allWarichu,
         styleRanges: styleRanges,
+        topOffset: extraHeight,
       ),
     );
   }

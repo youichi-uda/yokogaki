@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.5] - 2026-02-01
+
+### Fixed
+- **Ruby positioning**: Fix ruby text being drawn outside visible area (clipped)
+  - Apply `topOffset` in `HorizontalTextPainter`, `HorizontalRichTextPainter`, and `SelectableHorizontalTextPainter`
+  - Canvas now translates by `topOffset` to leave room for ruby/kenten above text
+  - Ruby/kenten annotations are now correctly visible above the base text
+
+### Changed
+- Remove unnecessary `characters` package import in `HorizontalTextLayouter` (already provided by flutter/material.dart)
+
 ## [0.10.4] - 2026-02-01
 
 ### Fixed
