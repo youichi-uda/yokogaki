@@ -59,6 +59,13 @@ class HorizontalTextPainter extends CustomPainter {
 
     final fontSize = style.baseStyle.fontSize ?? 16.0;
 
+    // Calculate reference alphabetic baseline for consistent vertical alignment
+    // This ensures fallback fonts align properly with the main font
+    // Note: ideographic baseline is the same across fonts, but alphabetic baseline differs
+    _textPainter.text = TextSpan(text: 'あ', style: style.baseStyle);
+    _textPainter.layout();
+    final referenceAlphaBaseline = _textPainter.computeDistanceToActualBaseline(TextBaseline.alphabetic) ?? fontSize;
+
     // Draw grid if enabled (for debugging)
     if (showGrid) {
       _drawGrid(canvas, size, fontSize);
@@ -97,7 +104,7 @@ class HorizontalTextPainter extends CustomPainter {
     // Draw each character (skip gaiji characters)
     for (final layout in layouts) {
       if (!gaijiIndices.contains(layout.textIndex)) {
-        _drawCharacter(canvas, layout);
+        _drawCharacter(canvas, layout, referenceAlphaBaseline);
       }
     }
 
@@ -141,14 +148,22 @@ class HorizontalTextPainter extends CustomPainter {
     textDirection: TextDirection.ltr,
   );
 
-  void _drawCharacter(Canvas canvas, CharacterLayout layout) {
+  void _drawCharacter(Canvas canvas, CharacterLayout layout, double referenceAlphaBaseline) {
     _textPainter.text = TextSpan(
       text: layout.character,
       style: style.baseStyle,
     );
 
     _textPainter.layout();
-    _textPainter.paint(canvas, layout.position);
+
+    // Calculate alphabetic baseline offset to align fallback fonts properly
+    // Different fonts have different alphabetic baselines (ascent/descent ratios)
+    // By aligning on alphabetic baseline, all characters appear at the same vertical position
+    final charAlphaBaseline = _textPainter.computeDistanceToActualBaseline(TextBaseline.alphabetic);
+    final baselineOffset = charAlphaBaseline != null ? referenceAlphaBaseline - charAlphaBaseline : 0.0;
+
+    final adjustedPosition = Offset(layout.position.dx, layout.position.dy + baselineOffset);
+    _textPainter.paint(canvas, adjustedPosition);
   }
 
   void _drawGrid(Canvas canvas, Size size, double fontSize) {
