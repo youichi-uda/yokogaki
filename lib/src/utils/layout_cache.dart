@@ -36,6 +36,9 @@ class LayoutCacheKey {
     return a.baseStyle.fontSize == b.baseStyle.fontSize &&
         a.baseStyle.color == b.baseStyle.color &&
         a.baseStyle.fontFamily == b.baseStyle.fontFamily &&
+        a.baseStyle.fontWeight == b.baseStyle.fontWeight &&
+        a.baseStyle.fontStyle == b.baseStyle.fontStyle &&
+        a.baseStyle.height == b.baseStyle.height &&
         a.lineSpacing == b.lineSpacing &&
         a.characterSpacing == b.characterSpacing &&
         a.adjustYakumono == b.adjustYakumono &&
@@ -68,6 +71,9 @@ class LayoutCacheKey {
       style.baseStyle.fontSize,
       style.baseStyle.color,
       style.baseStyle.fontFamily,
+      style.baseStyle.fontWeight,
+      style.baseStyle.fontStyle,
+      style.baseStyle.height,
       style.lineSpacing,
       style.characterSpacing,
       style.adjustYakumono,

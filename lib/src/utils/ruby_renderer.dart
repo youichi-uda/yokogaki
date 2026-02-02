@@ -200,8 +200,9 @@ class RubyRenderer {
           // Ruby above kenten (kenten is above text)
           rubyY = lineY + textTopOffset - kentenSize - rubyGap - rubyFontSize - rubyGap;
         } else if (hasOverlineInLine) {
-          // Ruby above overline
-          rubyY = lineY + textTopOffset - kentenSize - rubyGap - rubyFontSize - rubyGap;
+          // Ruby above overline (overline is thin, ~fontSize*0.05, so use smaller offset)
+          final overlineThickness = (baseFontSize * 0.05).clamp(1.0, 3.0);
+          rubyY = lineY + textTopOffset - overlineThickness - rubyGap - rubyFontSize;
         } else {
           // Ruby directly above text with small gap
           rubyY = lineY + textTopOffset - rubyFontSize - rubyGap;

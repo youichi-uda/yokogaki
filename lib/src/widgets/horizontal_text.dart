@@ -123,7 +123,8 @@ class _HorizontalTextState extends State<HorizontalText> {
           }
         },
         onError: (exception, stackTrace) {
-          // Handle image loading error silently
+          // Log gaiji image loading error for debugging
+          debugPrint('Gaiji image loading failed at index $i: $exception');
         },
       );
       _imageStreamListeners[i] = listener;

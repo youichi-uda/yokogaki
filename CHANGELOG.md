@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.8] - 2026-02-02
+
+### Fixed
+- **Line break character index bug**: Fix incorrect `textIndex` calculation when re-layouting characters after kinsoku line break
+  - Previously used `indexOf()` which returned wrong index for repeated characters
+  - Now uses proper index counter to track UTF-16 code unit positions
+- **Warichu splitIndex bounds check**: Add `clamp()` to prevent `RangeError` when `splitIndex` is out of bounds
+- **Ruby + Overline positioning**: Fix ruby being positioned too far above text when combined with overline
+  - Use actual overline thickness instead of kenten size for offset calculation
+- **LayoutCache comparison**: Add `fontWeight`, `fontStyle`, `height` to style comparison to prevent cache collisions
+- **Gaiji image loading**: Add debug logging for image loading failures
+
 ## [0.10.7] - 2026-02-02
 
 ### Fixed

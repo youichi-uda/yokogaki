@@ -117,17 +117,18 @@ class HorizontalTextLayouter {
               // Re-layout characters from actualBreakPos to i-1 on the new line
               // Use characters iteration for proper surrogate pair handling
               final remainingText = text.substring(actualBreakPos, i);
+              int charOffset = actualBreakPos;
               for (final reChar in remainingText.characters) {
-                final reCharIndex = actualBreakPos + remainingText.indexOf(reChar);
                 layouts.add(CharacterLayout(
                   character: reChar,
                   position: Offset(currentX, currentY),
-                  textIndex: reCharIndex,
+                  textIndex: charOffset,
                 ));
                 double charWidth = YakumonoAdjuster.isHalfWidthYakumono(reChar) && style.enableHalfWidthYakumono
                     ? fontSize * 0.5
                     : fontSize;
                 currentX += charWidth + style.characterSpacing;
+                charOffset += reChar.length; // Advance by UTF-16 code units
               }
             } else {
               // Break at current position
