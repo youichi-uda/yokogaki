@@ -63,6 +63,9 @@ class SelectableHorizontalTextPainter extends CustomPainter {
     onLayoutsCalculated?.call(layouts);
 
     final fontSize = style.baseStyle.fontSize ?? 16.0;
+    // Strip height multiplier to prevent character rendering overflow
+    // yokogaki manages line spacing independently via lineSpacing
+    final paintStyle = style.baseStyle.copyWith(height: 1.0);
 
     // Draw grid if enabled (for debugging)
     if (showGrid) {
@@ -97,7 +100,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
 
     // Draw each character
     for (final layout in layouts) {
-      _drawCharacter(canvas, layout);
+      _drawCharacter(canvas, layout, paintStyle);
     }
 
     // Draw ruby text
@@ -140,14 +143,6 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       }
     }
 
-    // Measure actual text height
-    final textPainter = TextPainter(
-      text: TextSpan(text: 'あ', style: style.baseStyle),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    final actualTextHeight = textPainter.height;
-
     const handleRadius = 6.0;
     const handleLineHeight = 20.0;
 
@@ -156,7 +151,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       _drawHandle(
         canvas,
         Offset(startLayout.position.dx, startLayout.position.dy),
-        actualTextHeight,
+        fontSize,
         handleRadius,
         handleLineHeight,
         isStart: true,
@@ -171,7 +166,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       _drawHandle(
         canvas,
         Offset(endLayout.position.dx + charWidth, endLayout.position.dy),
-        actualTextHeight,
+        fontSize,
         handleRadius,
         handleLineHeight,
         isStart: false,
@@ -228,14 +223,6 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       ..color = selectionColor
       ..style = PaintingStyle.fill;
 
-    // Measure actual text height using TextPainter
-    final textPainter = TextPainter(
-      text: TextSpan(text: 'あ', style: style.baseStyle),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    final actualTextHeight = textPainter.height;
-
     for (final layout in layouts) {
       final index = layout.textIndex;
       if (index >= start && index < end) {
@@ -246,7 +233,7 @@ class SelectableHorizontalTextPainter extends CustomPainter {
           layout.position.dx,
           layout.position.dy,
           charWidth,
-          actualTextHeight,
+          fontSize,
         );
         canvas.drawRect(rect, paint);
       }
@@ -258,10 +245,10 @@ class SelectableHorizontalTextPainter extends CustomPainter {
     textDirection: TextDirection.ltr,
   );
 
-  void _drawCharacter(Canvas canvas, CharacterLayout layout) {
+  void _drawCharacter(Canvas canvas, CharacterLayout layout, TextStyle paintStyle) {
     _textPainter.text = TextSpan(
       text: layout.character,
-      style: style.baseStyle,
+      style: paintStyle,
     );
 
     _textPainter.layout();
@@ -273,14 +260,6 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       ..color = Colors.blue.withValues(alpha: 0.5)
       ..strokeWidth = 1.0;
 
-    // Measure actual text height using TextPainter
-    final textPainter = TextPainter(
-      text: TextSpan(text: 'あ', style: style.baseStyle),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    final actualTextHeight = textPainter.height;
-
     // Draw vertical lines (columns)
     for (double x = 0; x <= size.width; x += fontSize) {
       canvas.drawLine(
@@ -290,8 +269,8 @@ class SelectableHorizontalTextPainter extends CustomPainter {
       );
     }
 
-    // Draw horizontal lines (rows) using actual text height + line spacing
-    final lineHeight = actualTextHeight + style.lineSpacing;
+    // Draw horizontal lines (rows) using fontSize + line spacing
+    final lineHeight = fontSize + style.lineSpacing;
     for (double y = 0; y <= size.height; y += lineHeight) {
       canvas.drawLine(
         Offset(0, y),

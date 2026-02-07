@@ -58,11 +58,14 @@ class HorizontalTextPainter extends CustomPainter {
     );
 
     final fontSize = style.baseStyle.fontSize ?? 16.0;
+    // Strip height multiplier to prevent character rendering overflow
+    // yokogaki manages line spacing independently via lineSpacing
+    final paintStyle = style.baseStyle.copyWith(height: 1.0);
 
     // Calculate reference alphabetic baseline for consistent vertical alignment
     // This ensures fallback fonts align properly with the main font
     // Note: ideographic baseline is the same across fonts, but alphabetic baseline differs
-    _textPainter.text = TextSpan(text: 'あ', style: style.baseStyle);
+    _textPainter.text = TextSpan(text: 'あ', style: paintStyle);
     _textPainter.layout();
     final referenceAlphaBaseline = _textPainter.computeDistanceToActualBaseline(TextBaseline.alphabetic) ?? fontSize;
 
@@ -104,7 +107,7 @@ class HorizontalTextPainter extends CustomPainter {
     // Draw each character (skip gaiji characters)
     for (final layout in layouts) {
       if (!gaijiIndices.contains(layout.textIndex)) {
-        _drawCharacter(canvas, layout, referenceAlphaBaseline);
+        _drawCharacter(canvas, layout, referenceAlphaBaseline, paintStyle);
       }
     }
 
@@ -148,10 +151,10 @@ class HorizontalTextPainter extends CustomPainter {
     textDirection: TextDirection.ltr,
   );
 
-  void _drawCharacter(Canvas canvas, CharacterLayout layout, double referenceAlphaBaseline) {
+  void _drawCharacter(Canvas canvas, CharacterLayout layout, double referenceAlphaBaseline, TextStyle paintStyle) {
     _textPainter.text = TextSpan(
       text: layout.character,
-      style: style.baseStyle,
+      style: paintStyle,
     );
 
     _textPainter.layout();
@@ -171,9 +174,9 @@ class HorizontalTextPainter extends CustomPainter {
       ..color = Colors.blue.withValues(alpha: 0.5)
       ..strokeWidth = 1.0;
 
-    // Measure actual text height using TextPainter
+    // Measure actual text height using TextPainter with height normalized to 1.0
     final textPainter = TextPainter(
-      text: TextSpan(text: 'あ', style: style.baseStyle),
+      text: TextSpan(text: 'あ', style: style.baseStyle.copyWith(height: 1.0)),
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();

@@ -151,10 +151,9 @@ class _LongPressSelectableHorizontalTextState
       return;
     }
 
-    // Get actual text height
-    _textPainter.text = TextSpan(text: 'あ', style: widget.style.baseStyle);
-    _textPainter.layout();
-    final textHeight = _textPainter.height;
+    // Get actual text height (use fontSize directly, not _textPainter.height
+    // which is inflated by the height: 1.6 property in baseStyle)
+    final textHeight = widget.style.baseStyle.fontSize ?? 16.0;
 
     double maxX = 0;
     double maxY = 0;
@@ -200,10 +199,9 @@ class _LongPressSelectableHorizontalTextState
   int _getCharacterIndexAt(Offset localPosition) {
     if (_characterLayouts == null || _characterLayouts!.isEmpty) return -1;
 
-    // Get actual text height
-    _textPainter.text = TextSpan(text: 'あ', style: widget.style.baseStyle);
-    _textPainter.layout();
-    final textHeight = _textPainter.height;
+    // Get actual text height (use fontSize directly, not _textPainter.height
+    // which is inflated by the height: 1.6 property in baseStyle)
+    final textHeight = widget.style.baseStyle.fontSize ?? 16.0;
 
     double closestDistance = double.infinity;
     int closestIndex = -1;
@@ -341,10 +339,9 @@ class _LongPressSelectableHorizontalTextState
     if (_selectionStart < 0 || _selectionEnd <= _selectionStart) return null;
     if (_characterLayouts == null) return null;
 
-    // Get actual text height
-    _textPainter.text = TextSpan(text: 'あ', style: widget.style.baseStyle);
-    _textPainter.layout();
-    final textHeight = _textPainter.height;
+    // Get actual text height (use fontSize directly, not _textPainter.height
+    // which is inflated by the height: 1.6 property in baseStyle)
+    final textHeight = widget.style.baseStyle.fontSize ?? 16.0;
 
     const handleRadius = 8.0;
 
@@ -429,9 +426,8 @@ class _LongPressSelectableHorizontalTextState
           }
         }
         if (endLayout != null) {
-          _textPainter.text = TextSpan(text: 'あ', style: widget.style.baseStyle);
-          _textPainter.layout();
-          final textHeight = _textPainter.height;
+          // Use fontSize directly, not _textPainter.height which is inflated by height: 1.6
+          final textHeight = widget.style.baseStyle.fontSize ?? 16.0;
 
           _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
           _textPainter.layout();
@@ -609,10 +605,9 @@ class _LongPressSelectableHorizontalTextPainter extends CustomPainter {
   void _paintSelection(Canvas canvas, Size size) {
     final paint = Paint()..color = selectionColor;
 
-    // Get actual text height
-    _textPainter.text = TextSpan(text: 'あ', style: style.baseStyle);
-    _textPainter.layout();
-    final textHeight = _textPainter.height;
+    // Get actual text height (use fontSize directly, not _textPainter.height
+    // which is inflated by the height: 1.6 property in baseStyle)
+    final textHeight = style.baseStyle.fontSize ?? 16.0;
 
     final start = math.min(selectionStart, selectionEnd);
     final end = math.max(selectionStart, selectionEnd);
@@ -635,10 +630,9 @@ class _LongPressSelectableHorizontalTextPainter extends CustomPainter {
   }
 
   void _paintHandles(Canvas canvas, Size size) {
-    // Get actual text height
-    _textPainter.text = TextSpan(text: 'あ', style: style.baseStyle);
-    _textPainter.layout();
-    final textHeight = _textPainter.height;
+    // Get actual text height (use fontSize directly, not _textPainter.height
+    // which is inflated by the height: 1.6 property in baseStyle)
+    final textHeight = style.baseStyle.fontSize ?? 16.0;
 
     const handleRadius = 8.0;
 

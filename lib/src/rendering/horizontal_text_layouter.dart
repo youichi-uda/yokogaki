@@ -292,9 +292,11 @@ class HorizontalTextLayouter {
 
     final fontSize = style.baseStyle.fontSize ?? 16.0;
 
-    // Measure actual text height using TextPainter
+    // Measure actual text height using TextPainter with height normalized to 1.0
+    // yokogaki manages line spacing independently, so TextStyle.height
+    // should not inflate the character cell height
     final textPainter = TextPainter(
-      text: TextSpan(text: 'あ', style: style.baseStyle),
+      text: TextSpan(text: 'あ', style: style.baseStyle.copyWith(height: 1.0)),
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();

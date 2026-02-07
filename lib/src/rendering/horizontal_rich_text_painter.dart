@@ -50,6 +50,9 @@ class HorizontalRichTextPainter extends CustomPainter {
     );
 
     final fontSize = style.baseStyle.fontSize ?? 16.0;
+    // Strip height multiplier for painting
+    // yokogaki manages line spacing independently via lineSpacing
+    final basePaintStyle = style.baseStyle.copyWith(height: 1.0);
 
     // Draw grid if enabled (for debugging)
     if (showGrid) {
@@ -80,7 +83,7 @@ class HorizontalRichTextPainter extends CustomPainter {
     // Draw each character with its appropriate style
     for (final layout in layouts) {
       final textIndex = layout.textIndex;
-      final charStyle = _getStyleForIndex(textIndex);
+      final charStyle = _getStyleForIndex(textIndex, basePaintStyle);
       _drawCharacter(canvas, layout, charStyle);
     }
 
@@ -101,16 +104,16 @@ class HorizontalRichTextPainter extends CustomPainter {
   }
 
   /// Get the text style for a specific character index
-  TextStyle _getStyleForIndex(int index) {
+  TextStyle _getStyleForIndex(int index, TextStyle basePaintStyle) {
     // Find the first style range that contains this index
     for (final range in styleRanges) {
       if (range.contains(index)) {
-        // Merge range style with base style
-        return style.baseStyle.merge(range.style);
+        // Merge range style with base paint style (height already neutralized)
+        return basePaintStyle.merge(range.style);
       }
     }
-    // Return base style if no range matches
-    return style.baseStyle;
+    // Return base paint style if no range matches
+    return basePaintStyle;
   }
 
   // Reusable TextPainter instance to avoid repeated allocations
@@ -137,9 +140,9 @@ class HorizontalRichTextPainter extends CustomPainter {
       ..color = Colors.blue.withValues(alpha: 0.5)
       ..strokeWidth = 1.0;
 
-    // Measure actual text height using TextPainter
+    // Measure actual text height using TextPainter with height normalized to 1.0
     final textPainter = TextPainter(
-      text: TextSpan(text: 'あ', style: style.baseStyle),
+      text: TextSpan(text: 'あ', style: style.baseStyle.copyWith(height: 1.0)),
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();
