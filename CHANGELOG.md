@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-02-08
+
+### Fixed
+- **Text selection handle drag inoperable**: Fix handle touch targets misaligned with visual handle circles
+  - `_getHandlePositions()` now returns the circle center coordinates instead of the stem top
+  - Touch targets (48x48px) are now properly centered on the draggable handle circles
+  - Matches the tategaki package's handle positioning pattern
+- **Text selection height inflation**: Fix `TextStyle.height` (e.g., 1.6) causing selection areas, handles, and hit testing to vertically expand beyond actual fontSize
+  - Normalize rendering to `height: 1.0` and use `fontSize` directly for height calculations
+  - Yokogaki manages line spacing independently via `lineSpacing` parameter
+- **Text selection handles blocked by dismiss layer**: Remove full-screen context menu dismiss layer that intercepted touch events on selection handles
+  - Expanded handle touch area from 32px to 48px
+  - Added `onHandleDragStart`/`onHandleDragEnd` callbacks for parent scroll integration
+
 ## [0.10.9] - 2026-02-03
 
 ### Fixed

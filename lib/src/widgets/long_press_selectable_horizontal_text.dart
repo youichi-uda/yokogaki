@@ -398,6 +398,7 @@ class _LongPressSelectableHorizontalTextState
     if (_characterLayouts == null) return (null, null);
 
     final fontSize = widget.style.baseStyle.fontSize ?? 16.0;
+    const handleRadius = 8.0;
 
     final start = math.min(_selectionStart, _selectionEnd);
     final end = math.max(_selectionStart, _selectionEnd);
@@ -414,10 +415,10 @@ class _LongPressSelectableHorizontalTextState
     Offset? endPos;
 
     if (startLayout != null) {
-      // Start handle: bottom-left of first selected char
+      // Hit target center = circle center (bottom of handle stem)
       startPos = Offset(
         startLayout.position.dx,
-        startLayout.position.dy + fontSize,
+        startLayout.position.dy + fontSize + handleRadius * 2 + handleRadius,
       );
     }
 
@@ -425,10 +426,10 @@ class _LongPressSelectableHorizontalTextState
       _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
       _textPainter.layout();
       final endCharWidth = _textPainter.width;
-      // End handle: bottom-right of last selected char
+      // Hit target center = circle center (bottom of handle stem)
       endPos = Offset(
         endLayout.position.dx + endCharWidth,
-        endLayout.position.dy + fontSize,
+        endLayout.position.dy + fontSize + handleRadius * 2 + handleRadius,
       );
     }
 
