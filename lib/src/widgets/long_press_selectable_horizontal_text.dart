@@ -60,6 +60,12 @@ class LongPressSelectableHorizontalText extends StatefulWidget {
   /// Long press duration before selection starts (default: 500ms)
   final Duration longPressDuration;
 
+  /// Called when handle drag starts. Use this to disable parent scrolling.
+  final VoidCallback? onHandleDragStart;
+
+  /// Called when handle drag ends. Use this to re-enable parent scrolling.
+  final VoidCallback? onHandleDragEnd;
+
   const LongPressSelectableHorizontalText({
     super.key,
     required this.text,
@@ -72,6 +78,8 @@ class LongPressSelectableHorizontalText extends StatefulWidget {
     this.gaijiList = const [],
     this.selectionColor,
     this.longPressDuration = const Duration(milliseconds: 500),
+    this.onHandleDragStart,
+    this.onHandleDragEnd,
   });
 
   @override
@@ -227,6 +235,59 @@ class _LongPressSelectableHorizontalTextState
     return closestIndex;
   }
 
+  void _handlePanUpdate(Offset position) {
+    if (_dragTarget == _DragTarget.none) return;
+
+    final charIndex = _getCharacterIndexAt(position);
+    if (charIndex < 0) return;
+
+    setState(() {
+      if (_dragTarget == _DragTarget.startHandle) {
+        if (charIndex < _selectionEnd) {
+          _selectionStart = charIndex;
+        }
+      } else if (_dragTarget == _DragTarget.endHandle) {
+        final newEnd = (charIndex + 1).clamp(0, widget.text.length);
+        if (newEnd > _selectionStart) {
+          _selectionEnd = newEnd;
+        }
+      }
+    });
+  }
+
+  void _handlePanEnd() {
+    if (_dragTarget != _DragTarget.none) {
+      _dragTarget = _DragTarget.none;
+
+      // Show context menu after handle drag
+      if (_selectionStart >= 0 && _selectionEnd > _selectionStart) {
+        final renderBox = context.findRenderObject() as RenderBox?;
+        if (renderBox != null && _characterLayouts != null) {
+          final end = math.max(_selectionStart, _selectionEnd);
+          CharacterLayout? endLayout;
+          for (final layout in _characterLayouts!) {
+            if (layout.textIndex == end - 1) {
+              endLayout = layout;
+              break;
+            }
+          }
+          if (endLayout != null) {
+            final fontSize = widget.style.baseStyle.fontSize ?? 16.0;
+            _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
+            _textPainter.layout();
+            final charWidth = _textPainter.width;
+            final localPos = Offset(
+              endLayout.position.dx + charWidth,
+              endLayout.position.dy + fontSize,
+            );
+            final globalPos = renderBox.localToGlobal(localPos);
+            _showContextMenu(globalPos);
+          }
+        }
+      }
+    }
+  }
+
   void _handleLongPressStart(LongPressStartDetails details) {
     _hideContextMenu();
 
@@ -299,10 +360,6 @@ class _LongPressSelectableHorizontalTextState
       builder: (context) => _SelectionContextMenu(
         position: globalPosition,
         onCopy: _copySelection,
-        onDismiss: () {
-          _hideContextMenu();
-          _clearSelection();
-        },
       ),
     );
 
@@ -334,114 +391,48 @@ class _LongPressSelectableHorizontalTextState
     _clearSelection();
   }
 
-  /// Get handle positions for overlay
-  ({Offset start, Offset end})? _getHandlePositions() {
-    if (_selectionStart < 0 || _selectionEnd <= _selectionStart) return null;
-    if (_characterLayouts == null) return null;
+  (Offset?, Offset?) _getHandlePositions() {
+    if (_selectionStart < 0 || _selectionEnd <= _selectionStart) {
+      return (null, null);
+    }
+    if (_characterLayouts == null) return (null, null);
 
-    // Get actual text height (use fontSize directly, not _textPainter.height
-    // which is inflated by the height: 1.6 property in baseStyle)
-    final textHeight = widget.style.baseStyle.fontSize ?? 16.0;
+    final fontSize = widget.style.baseStyle.fontSize ?? 16.0;
 
-    const handleRadius = 8.0;
+    final start = math.min(_selectionStart, _selectionEnd);
+    final end = math.max(_selectionStart, _selectionEnd);
 
     CharacterLayout? startLayout;
     CharacterLayout? endLayout;
-    final start = math.min(_selectionStart, _selectionEnd);
-    final end = math.max(_selectionStart, _selectionEnd);
 
     for (final layout in _characterLayouts!) {
       if (layout.textIndex == start) startLayout = layout;
       if (layout.textIndex == end - 1) endLayout = layout;
     }
 
-    if (startLayout == null || endLayout == null) return null;
+    Offset? startPos;
+    Offset? endPos;
 
-    // Start handle: at bottom-left of first selected character
-    final startPos = Offset(
-      startLayout.position.dx - handleRadius,
-      startLayout.position.dy + textHeight,
-    );
-
-    // End handle: at bottom-right of last selected character
-    _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
-    _textPainter.layout();
-    final endCharWidth = _textPainter.width;
-
-    final endPos = Offset(
-      endLayout.position.dx + endCharWidth - handleRadius,
-      endLayout.position.dy + textHeight,
-    );
-
-    return (start: startPos, end: endPos);
-  }
-
-  void _onHandleDragStart(_DragTarget target) {
-    _hideContextMenu();
-    setState(() {
-      _dragTarget = target;
-    });
-    HapticFeedback.selectionClick();
-  }
-
-  void _onHandleDragUpdate(DragUpdateDetails details, _DragTarget target) {
-    if (_dragTarget != target) return;
-
-    final renderBox = context.findRenderObject() as RenderBox?;
-    if (renderBox == null) return;
-
-    final localPosition = renderBox.globalToLocal(details.globalPosition);
-    final charIndex = _getCharacterIndexAt(localPosition);
-    if (charIndex < 0) return;
-
-    setState(() {
-      if (target == _DragTarget.startHandle) {
-        if (charIndex < _selectionEnd) {
-          _selectionStart = charIndex;
-        }
-      } else if (target == _DragTarget.endHandle) {
-        final newEnd = (charIndex + 1).clamp(0, widget.text.length);
-        if (newEnd > _selectionStart) {
-          _selectionEnd = newEnd;
-        }
-      }
-    });
-  }
-
-  void _onHandleDragEnd(_DragTarget target) {
-    setState(() {
-      _dragTarget = _DragTarget.none;
-    });
-
-    // Show context menu
-    if (_selectionStart >= 0 && _selectionEnd > _selectionStart) {
-      final renderBox = context.findRenderObject() as RenderBox?;
-      if (renderBox != null && _characterLayouts != null) {
-        final end = math.max(_selectionStart, _selectionEnd);
-        CharacterLayout? endLayout;
-        for (final layout in _characterLayouts!) {
-          if (layout.textIndex == end - 1) {
-            endLayout = layout;
-            break;
-          }
-        }
-        if (endLayout != null) {
-          // Use fontSize directly, not _textPainter.height which is inflated by height: 1.6
-          final textHeight = widget.style.baseStyle.fontSize ?? 16.0;
-
-          _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
-          _textPainter.layout();
-          final charWidth = _textPainter.width;
-
-          final localPos = Offset(
-            endLayout.position.dx + charWidth,
-            endLayout.position.dy + textHeight,
-          );
-          final globalPos = renderBox.localToGlobal(localPos);
-          _showContextMenu(globalPos);
-        }
-      }
+    if (startLayout != null) {
+      // Start handle: bottom-left of first selected char
+      startPos = Offset(
+        startLayout.position.dx,
+        startLayout.position.dy + fontSize,
+      );
     }
+
+    if (endLayout != null) {
+      _textPainter.text = TextSpan(text: endLayout.character, style: widget.style.baseStyle);
+      _textPainter.layout();
+      final endCharWidth = _textPainter.width;
+      // End handle: bottom-right of last selected char
+      endPos = Offset(
+        endLayout.position.dx + endCharWidth,
+        endLayout.position.dy + fontSize,
+      );
+    }
+
+    return (startPos, endPos);
   }
 
   @override
@@ -451,71 +442,119 @@ class _LongPressSelectableHorizontalTextState
         _ensureLayout(constraints);
 
         final hasSelection = _selectionStart >= 0 && _selectionEnd > _selectionStart;
-        final handlePositions = hasSelection ? _getHandlePositions() : null;
         final handleColor = Theme.of(context).colorScheme.primary;
-        const handleSize = 32.0; // Touch target size
+
+        final customPaint = CustomPaint(
+          size: _computedSize ?? Size.zero,
+          painter: _LongPressSelectableHorizontalTextPainter(
+            text: widget.text,
+            style: widget.style,
+            maxWidth: widget.maxWidth,
+            rubyList: widget.rubyList,
+            kentenList: widget.kentenList,
+            warichuList: widget.warichuList,
+            decorationList: widget.decorationList,
+            gaijiList: widget.gaijiList,
+            selectionStart: _selectionStart,
+            selectionEnd: _selectionEnd,
+            selectionColor: widget.selectionColor ??
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
+            characterLayouts: _characterLayouts,
+            showHandles: hasSelection,
+            handleColor: handleColor,
+          ),
+        );
+
+        final baseWidget = GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _handleTap,
+          onLongPressStart: _handleLongPressStart,
+          onLongPressMoveUpdate: _handleLongPressMoveUpdate,
+          onLongPressEnd: _handleLongPressEnd,
+          child: customPaint,
+        );
+
+        // When no selection, just return base widget
+        if (!hasSelection) {
+          return baseWidget;
+        }
+
+        // With selection, overlay handle touch targets
+        final (startPos, endPos) = _getHandlePositions();
+        const hitSize = 48.0; // Large touch target
 
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            // Main text with gesture detection
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _handleTap,
-              onLongPressStart: _handleLongPressStart,
-              onLongPressMoveUpdate: _handleLongPressMoveUpdate,
-              onLongPressEnd: _handleLongPressEnd,
-              child: CustomPaint(
-                size: _computedSize ?? Size.zero,
-                painter: _LongPressSelectableHorizontalTextPainter(
-                  text: widget.text,
-                  style: widget.style,
-                  maxWidth: widget.maxWidth,
-                  rubyList: widget.rubyList,
-                  kentenList: widget.kentenList,
-                  warichuList: widget.warichuList,
-                  decorationList: widget.decorationList,
-                  gaijiList: widget.gaijiList,
-                  selectionStart: _selectionStart,
-                  selectionEnd: _selectionEnd,
-                  selectionColor: widget.selectionColor ??
-                      Theme.of(context).colorScheme.primary.withValues(alpha: 0.4),
-                  characterLayouts: _characterLayouts,
-                  showHandles: hasSelection,
-                  handleColor: handleColor,
-                ),
-              ),
-            ),
-            // Start handle overlay
-            if (handlePositions != null)
+            baseWidget,
+            // Start handle touch target
+            if (startPos != null)
               Positioned(
-                left: handlePositions.start.dx,
-                top: handlePositions.start.dy,
+                left: startPos.dx - hitSize / 2,
+                top: startPos.dy - hitSize / 2,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onPanStart: (_) => _onHandleDragStart(_DragTarget.startHandle),
-                  onPanUpdate: (details) => _onHandleDragUpdate(details, _DragTarget.startHandle),
-                  onPanEnd: (_) => _onHandleDragEnd(_DragTarget.startHandle),
+                  onPanStart: (details) {
+                    _dragTarget = _DragTarget.startHandle;
+                    _hideContextMenu();
+                    HapticFeedback.selectionClick();
+                    widget.onHandleDragStart?.call();
+                  },
+                  onPanUpdate: (details) {
+                    final box = context.findRenderObject() as RenderBox?;
+                    if (box != null) {
+                      final localPos = box.globalToLocal(details.globalPosition);
+                      _handlePanUpdate(localPos);
+                    }
+                  },
+                  onPanEnd: (details) {
+                    _handlePanEnd();
+                    widget.onHandleDragEnd?.call();
+                    _dragTarget = _DragTarget.none;
+                  },
+                  onPanCancel: () {
+                    widget.onHandleDragEnd?.call();
+                    _dragTarget = _DragTarget.none;
+                  },
                   child: Container(
-                    width: handleSize,
-                    height: handleSize,
+                    width: hitSize,
+                    height: hitSize,
                     color: Colors.transparent,
                   ),
                 ),
               ),
-            // End handle overlay
-            if (handlePositions != null)
+            // End handle touch target
+            if (endPos != null)
               Positioned(
-                left: handlePositions.end.dx,
-                top: handlePositions.end.dy,
+                left: endPos.dx - hitSize / 2,
+                top: endPos.dy - hitSize / 2,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onPanStart: (_) => _onHandleDragStart(_DragTarget.endHandle),
-                  onPanUpdate: (details) => _onHandleDragUpdate(details, _DragTarget.endHandle),
-                  onPanEnd: (_) => _onHandleDragEnd(_DragTarget.endHandle),
+                  onPanStart: (details) {
+                    _dragTarget = _DragTarget.endHandle;
+                    _hideContextMenu();
+                    HapticFeedback.selectionClick();
+                    widget.onHandleDragStart?.call();
+                  },
+                  onPanUpdate: (details) {
+                    final box = context.findRenderObject() as RenderBox?;
+                    if (box != null) {
+                      final localPos = box.globalToLocal(details.globalPosition);
+                      _handlePanUpdate(localPos);
+                    }
+                  },
+                  onPanEnd: (details) {
+                    _handlePanEnd();
+                    widget.onHandleDragEnd?.call();
+                    _dragTarget = _DragTarget.none;
+                  },
+                  onPanCancel: () {
+                    widget.onHandleDragEnd?.call();
+                    _dragTarget = _DragTarget.none;
+                  },
                   child: Container(
-                    width: handleSize,
-                    height: handleSize,
+                    width: hitSize,
+                    height: hitSize,
                     color: Colors.transparent,
                   ),
                 ),
@@ -724,55 +763,43 @@ class _LongPressSelectableHorizontalTextPainter extends CustomPainter {
 }
 
 /// Context menu for copy action
+/// Note: No full-screen dismiss layer to allow handle touches to pass through.
+/// Menu is dismissed by: tapping text, copying, or dragging a handle.
 class _SelectionContextMenu extends StatelessWidget {
   final Offset position;
   final VoidCallback onCopy;
-  final VoidCallback onDismiss;
 
   const _SelectionContextMenu({
     required this.position,
     required this.onCopy,
-    required this.onDismiss,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // Dismiss layer
-        Positioned.fill(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onDismiss,
-            child: const SizedBox.expand(),
-          ),
-        ),
-        // Context menu
-        Positioned(
-          left: position.dx - 40,
-          top: position.dy - 50,
-          child: Material(
-            elevation: 8,
-            borderRadius: BorderRadius.circular(8),
-            child: InkWell(
-              onTap: onCopy,
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.copy, size: 18),
-                    SizedBox(width: 6),
-                    Text('コピー'),
-                  ],
-                ),
-              ),
+    // No dismiss layer - just the menu button
+    // This allows handle touch targets to receive gestures
+    return Positioned(
+      left: position.dx - 40,
+      top: position.dy - 50,
+      child: Material(
+        elevation: 8,
+        borderRadius: BorderRadius.circular(8),
+        child: InkWell(
+          onTap: onCopy,
+          borderRadius: BorderRadius.circular(8),
+          child: const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.copy, size: 18),
+                SizedBox(width: 6),
+                Text('コピー'),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 }
